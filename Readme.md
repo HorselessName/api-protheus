@@ -4,6 +4,10 @@ Essa API para o Protheus é uma interface de consulta para o sistema TOTVS Proth
 Ela foi desenvolvida para proporcionar um acesso simplificado a dados não disponíveis nas APIs REST 
 padrão da TOTVS. Ela API é de "somente leitura" e foca apenas em operações GET.
 
+A API foi desenvolvida seguindo padrões de orientação a objeto, para facilitar a manutenção e
+fornecer a abstração de dados. Ela utiliza o SQLAlchemy para mapear as entidades e o Marshmallow do Flask para
+serializar os dados.
+
 # Dependencies / Installation
 Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`
 
