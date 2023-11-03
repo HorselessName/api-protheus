@@ -1,10 +1,15 @@
-# Imports relacionados ao banco de dados e configurações
+# Imports do Flask + SQLAlchemy para consultas ao banco de dados.
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import MetaData
+
+# URL Lib para conexão com o SQL Server usando nosso .env.
 import urllib.parse
 from dotenv import dotenv_values
+
+# Tratativas de Erros e Logs do SQLAlchemy.
 from sqlalchemy.exc import OperationalError, InvalidRequestError
+import logging
 
 config = dotenv_values(".env")
 
@@ -18,6 +23,9 @@ config_mssql = urllib.parse.quote_plus(
     "timeout=3;")
 
 DATABASE_URI = 'mssql+pyodbc:///?odbc_connect={}'.format(config_mssql)
+
+logging.basicConfig()
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 
 # Base para as models seguirem o padrão do SQLAlchemy, usando suas naming conventions.

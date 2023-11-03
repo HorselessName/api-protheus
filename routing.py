@@ -1,9 +1,10 @@
-from routes.EquipamentosRoutes import equipamentos_routes
-from routes.ManutencaoRoutes import manutencao_routes
-from routes.FilialRoutes import filial_routes
-
-
 def initialize_routes(app):
-    equipamentos_routes(app)
-    manutencao_routes(app)
-    filial_routes(app)
+    from routes.EquipamentoRoute import blueprint_equipamentos
+    app.register_blueprint(blueprint_equipamentos)
+
+    from routes.ManutencaoRoute import blueprint_manutencao
+    app.register_blueprint(blueprint_manutencao)
+
+    from routes.FilialRoute import blueprint_filial
+    app.register_blueprint(blueprint_filial)
+

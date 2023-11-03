@@ -13,5 +13,6 @@ flask-marshmallow = "*"
 flasgger = "*"
 pyodbc = "*"
 python-dotenv = "*"
+flask-cors = "*"
 
 [dev-packages]
