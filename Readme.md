@@ -31,6 +31,7 @@ Executar de fora do venv, dentro da pasta do projeto via terminal.
 - Flasgger for Swagger: `pipenv install flasgger`
 - PyODBC Driver do SQL Server: `pipenv install pyodbc`
 - Python DOT Env para variaveis de ambiente: `pipenv install python-dotenv`
+- Flask CORS para permitir acesso externo: `pipenv install flask-cors`
 
 # Entitades
 
