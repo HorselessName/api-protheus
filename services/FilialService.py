@@ -1,11 +1,106 @@
-# == Filial Service ==
-import re
+# Importar Models para as queries do Flask-SQLAlchemy
+from models import Filial
+from models.Equipamento import Equipamento
+from models.Setor import Setor
 
-from sqlalchemy.exc import OperationalError, SQLAlchemyError
-from sqlalchemy import case, literal
-from models import Filial, Setor, Equipamento
-from schemas import FilialSchema, SetorSchema
+# Importar o Controller do DB, o SQLAlchemy do Flask.
 from db_context import db_sql
+
+# Importar nossos Schemas para o Marshmallow conseguir serializar os dados.
+from schemas import SetorSchema, FilialSchema
+
+# Importar classes do SQLAlchemy para construirmos as lógicas condicionais.
+from sqlalchemy import case, literal_column
+from sqlalchemy.exc import SQLAlchemyError, OperationalError
+
+# Importar modulos de validacao
+from services.utils import *
+
+
+class SetorLogic:
+
+    @staticmethod
+    def junta_tabelas_setores_equipamentos():
+        """
+        Passo 1: Junta as tabelas de Setores e Equipamentos.
+        Retorna a Sub Query que pode ser usada em outros métodos,
+        inclusive podendo adicionar mais métodos do SQLAlchemy dentro da Sub Query.
+
+        :return: Sub Query com as tabelas de Setores e Equipamentos.
+        """
+        # Iniciar consulta para juntar tabelas de Equipamentos e Setores
+        equipamentos_setores = db_sql.session.query(
+            # SELECT n FROM <Table>
+            Equipamento.equipamento_filial.label('setor_filial'),
+            Setor.setor_codigo.label('setor_codigo'),
+            Setor.setor_nome.label('setor_nome'),
+        ).join(
+            # JOIN <Table> ON <Table>.<Column> = <Table>.<Column>
+            Setor, Setor.setor_codigo == Equipamento.equipamento_setor
+        ).distinct(
+            # SELECT DISTINCT <Column>
+        )
+
+        return equipamentos_setores
+
+    @staticmethod
+    def setores_equipamentos_com_grupo(setor_codigo_opcional=None, grupo_condicional=None, grupo_padrao=None):
+        """ Passo 3: Adicionar a coluna de Grupo de forma condicional e retornar a query montada. """
+
+        # Objeto base para os filtros e métodos do SQLAlchemy.
+        query_base = SetorLogic.junta_tabelas_setores_equipamentos()
+
+        # Verifica se devemos adicionar a lógica condicional.
+        if setor_codigo_opcional and grupo_condicional and grupo_padrao is not None:
+            # Adiciona coluna com lógica condicional CASE WHEN.
+            query_setores_com_grupo = query_base.add_columns(
+                case(
+                    (Equipamento.equipamento_setor == setor_codigo_opcional, grupo_condicional),
+                    else_=grupo_padrao
+                ).label('setor_grupo')
+            )
+        elif grupo_padrao is not None:
+            # Adiciona coluna com valor padrão.
+            query_setores_com_grupo = query_base.add_columns(
+                literal_column(f"'{grupo_padrao}'").label('setor_grupo')
+            )
+        else:
+            # Se não houver grupo padrão definido e a condição não for aplicável,
+            # apenas continua sem a coluna 'setor_grupo'
+            query_setores_com_grupo = query_base
+
+        return query_setores_com_grupo
+
+    @staticmethod
+    def setores_ajustar_filial(setor_codigo_opcional=None,
+                               grupo_condicional=None,
+                               filial_condicional=None,
+                               grupo_padrao=None,
+                               filial_padrao=None):
+        """Passo 4: Alterar a coluna de Filial de forma condicional e retornar a query montada."""
+
+        # Primeiro, obtemos a query com o grupo já aplicado
+        query_com_grupo = SetorLogic.setores_equipamentos_com_grupo(
+            setor_codigo_opcional, grupo_condicional, grupo_padrao)
+
+        # Verifica se devemos adicionar a lógica condicional para a coluna de Filial.
+        if setor_codigo_opcional and filial_condicional:
+            # Adiciona coluna com lógica condicional CASE WHEN.
+            # noinspection PyTypeChecker
+            query_com_filial = query_com_grupo.add_columns(
+                case(
+                    (Equipamento.equipamento_setor == setor_codigo_opcional, filial_condicional),
+                    else_=filial_padrao
+                ).label('setor_filial')
+            )
+        else:
+            # Adiciona coluna com valor padrão.
+            query_com_filial = query_com_grupo.add_columns(
+                literal_column(f"'{filial_padrao}'").label('setor_filial')
+            )
+
+        # Retorna a query com as modificações aplicadas
+        return query_com_filial
 
 
 class FilialService:
@@ -28,152 +123,66 @@ class FilialService:
             return None, str(e)
 
     @staticmethod
-    def buscar_setores(setor_param=None,
-                       grupo_condicional=None,
-                       grupo_default=None,
-                       filial_condicional=None,
-                       setor_filial=None,
-                       setor_grupo=None):
-        # Passo 4: Tratando os Testes, Condições e Segurança dos Parâmetros
-        def validate_parameters(**kwargs):
-            """Função que valida os parâmetros baseado em condições e regras de segurança."""
-            # Evitando XSS e SQL Injection
-            def is_valid_param(param):
-                # Definindo um tamanho máximo para cada parâmetro
-                max_length = 50
-                if not re.match("^[a-zA-Z0-9]*$", param) or len(param) > max_length:
-                    return False
-                return True
+    def executar_e_serializar_query(setor_codigo_opcional=None,
+                                    grupo_condicional=None,
+                                    filial_condicional=None,
+                                    grupo_padrao=None,
+                                    filial_padrao=None):
+        """ Executa a query e serializa os dados para JSON. """
 
-            # Validação de cada parâmetro contra regras de segurança
-            for key, value in kwargs.items():
-                if value and not is_valid_param(value):
-                    return {"error": f"O parâmetro '{key}' contém caracteres inválidos ou é muito longo."}
+        # Verifica se Grupo Padrão e Filial Padrão foram fornecidos
+        if not grupo_padrao or not filial_padrao:
+            return {"Erro": "Grupo Padrão e Filial Padrão são obrigatórios."}
 
-            # Validação de lógica dos parâmetros
-            if not kwargs.get('grupo_default'):
-                return {"error": "Um Grupo Default deve ser fornecido."}
+        # Valida Grupo Padrão e Filial Padrão
+        grupo_valido, msg_grupo = validar_grupo(grupo_padrao)
+        filial_valida, msg_filial = validar_filial(filial_padrao)
+        if not grupo_valido:
+            return {"Erro": msg_grupo}
+        if not filial_valida:
+            return {"Erro": msg_filial}
 
-            if kwargs.get('setor_param') and (not kwargs.get('grupo_condicional') or not kwargs.get('filial_condicional')):
-                return {"error": "Se Setor for informado, o Grupo Condicional e a Filial Condicional são Obrigatórios."}
+        # Valida Setor Código, se fornecido
+        if setor_codigo_opcional:
+            # Verifica se os parâmetros condicionais acompanham o Setor Código
+            if not grupo_condicional or not filial_condicional:
+                return {"Erro": "Grupo e Filial Condicional são obrigatórios quando Setor Código é fornecido."}
 
-            if not kwargs.get('setor_param') and (kwargs.get('grupo_condicional') or kwargs.get('filial_condicional')):
-                return {"error": "Se Grupo Condicional ou Filial Condicional forem informados, o Setor é Obrigatório."}
+            # Valida o Setor Código
+            setor_valido, msg = validar_setor(setor_codigo_opcional)
+            if not setor_valido:
+                return {"Erro": msg}
 
-            return None  # se tudo estiver bem
+        # Ignora Grupo e Filial Condicional se Setor Código não é fornecido
+        if not setor_codigo_opcional and (grupo_condicional or filial_condicional):
+            grupo_condicional = None
+            filial_condicional = None
 
-        # Passo 4 - Continuação: Verificar / Validar todos os Parametros informados.
-        error_response = validate_parameters(setor_param=setor_param,
-                                             grupo_condicional=grupo_condicional,
-                                             grupo_default=grupo_default,
-                                             filial_condicional=filial_condicional,
-                                             setor_filial=setor_filial,
-                                             setor_grupo=setor_grupo)
-
-        if error_response:
-            return error_response
-
-        sub_query_with_case = None
-        results = []
-
-        # Etapa 4 - Continuação: Tratando o fluxo quando apenas o grupo_default é fornecido
-        if grupo_default and not setor_param and not grupo_condicional:
-            try:
-                # Se apenas o grupo_default for fornecido, busca todos os setores
-                query = db_sql.session.query(
-                    Setor.setor_filial.label("setor_filial"),
-                    literal(grupo_default).label("setor_grupo"),
-                    Setor.setor_codigo,
-                    Setor.setor_nome
-                )
-                results = query.all()
-            except SQLAlchemyError as e:
-                print(f"Erro na Etapa 4 - Continuação: {e}")
-                return None
-
-        # Passo 1: Juntar os resultados das Tabelas - INNER JOIN de Setores e Equipamentos
+        # Tente executar a query com os parâmetros validados
         try:
-            sub_query = db_sql.session.query(
-                Equipamento.equipamento_filial.label("setor_filial"),
-                Setor.setor_codigo,
-                Setor.setor_nome
-            ).join(
-                Setor, Setor.setor_codigo == Equipamento.equipamento_setor
-            ).distinct().subquery('setores_temp')
+            # Constrói a query com os parâmetros fornecidos
+            query_setores_com_grupo = SetorLogic.setores_ajustar_filial(
+                setor_codigo_opcional, grupo_condicional, filial_condicional, grupo_padrao, filial_padrao
+            )
+
+            # Executa a Query e armazena os dados
+            dados_setores_equipamentos = query_setores_com_grupo.all()
+
+            # Serializa os resultados para JSON
+            setor_schema = SetorSchema(many=True)
+            dados_setores_equipamentos_json = setor_schema.dump(dados_setores_equipamentos)
+
+            # Captura o comando SQL executado
+            comando_sql = str(query_setores_com_grupo.statement.compile(compile_kwargs={"literal_binds": True}))
+
+            # Retorna um objeto com os detalhes da operação
+            return {
+                "Passo": "Teste -- Executar e serializar a query",
+                "Detalhes": {
+                    "Comando SQL": comando_sql,
+                    "Dados": dados_setores_equipamentos_json
+                }
+            }
         except SQLAlchemyError as e:
-            print(f"Erro no passo 1: {e}")
-            return None
-
-        try:
-            # Passo 4: Testes e validações - Verificamos se todas as condições foram atendidas
-            if setor_param and grupo_condicional and filial_condicional:
-                # Passo 3: Aplicação da condição para definição do setor_grupo e da filial.
-                conditions_grupo = [
-                    (sub_query.c.setor_codigo == setor_param, grupo_condicional)
-                ]
-
-                conditions_filial = [
-                    (sub_query.c.setor_codigo == setor_param, filial_condicional)
-                ]
-
-                # Passo 5: Incrementando o campo da filial junto com o que já estava sendo usado, campo grupo.
-                sub_query_with_case = db_sql.session.query(
-                    case(
-                        *conditions_filial,
-                        else_=sub_query.c.setor_filial
-                    ).label("setor_filial"),
-                    case(
-                        *conditions_grupo,
-                        else_=grupo_default
-                    ).label("setor_grupo"),
-                    sub_query.c.setor_codigo,
-                    sub_query.c.setor_nome
-                ).subquery('setores')
-
-        except SQLAlchemyError as e:
-            print(f"Erro ao buscar setores: {e}")
-            return None
-
-        try:
-            # Passo 4 - Continuação: Só tento fazer a query aqui se a sub_query_with_case foi definida.
-            if sub_query_with_case is not None:
-
-                # Passo 2: Tabela Setores - Retorno do INNER JOIN de Setores e Equipamentos
-                query = db_sql.session.query(
-                    sub_query_with_case.c.setor_filial,
-                    sub_query_with_case.c.setor_grupo,
-                    sub_query_with_case.c.setor_codigo,
-                    sub_query_with_case.c.setor_nome
-                )
-
-                # Condições de filtro
-                filter_conditions = []
-
-                # Passo 6: Adicionando o filtro para a filial e o grupo
-                if setor_filial:  # Se setor_filial tiver um valor
-                    filter_conditions.append(sub_query_with_case.c.setor_filial == setor_filial)
-
-                if setor_grupo:  # Se setor_grupo tiver um valor
-                    filter_conditions.append(sub_query_with_case.c.setor_grupo == setor_grupo)
-
-                # Aplicando todos os filtros de uma vez
-                if filter_conditions:
-                    query = query.filter(*filter_conditions)
-
-                results = query.all()
-        except SQLAlchemyError as e:
-            print(f"Erro nos passos 2/4/6 - Consulta na Sub Query with Case: {e}")
-            return None
-
-        try:
-            # Desserialização usando Marshmallow
-            schema = SetorSchema(many=True)
-            output = schema.dump(results)
-
-            if not output:
-                return {"error": "Não foram encontrados dados para os parâmetros fornecidos."}
-
-            return output
-        except Exception as e:
-            print(f"Erro ao desserializar: {e}")
-            return None
+            # Em caso de erro na execução da query, retorna a descrição do erro
+            return {"Erro": str(e)}
