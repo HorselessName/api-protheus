@@ -1,78 +1,107 @@
 from flask import Blueprint, request, jsonify
-from services.FilialService import FilialService
+from services.FilialService import FilialService, SetorLogic
 
 blueprint_filial = Blueprint('filial', __name__)
+
+
+@blueprint_filial.route('/filial/testes', methods=['GET'])
+def fazer_testes():
+    """
+    Rota para Testes
+    ---
+    tags:
+      - Testes
+    responses:
+      200:
+        description: Teste Ok.
+    """
+    # Retorna a consulta SQL como parte da resposta da API.
+    return jsonify(message="Teste Ok!")
 
 
 @blueprint_filial.route('/filial/setores', methods=['GET'])
 def get_setores():
     """
-    Retorna a lista dos setores para os grupos e filiais informados.
+    Retorna a lista dos setores para os grupos e filiais informados, com a possibilidade de aplicar filtros condicionais e padrões.
     ---
     tags:
       - Setores
     parameters:
-      - name: setor_codigo_opcional
+      - name: setor_no_request
         in: query
         type: string
         required: false
-        description: Código opcional do setor para aplicar a lógica de teste condicional.
-      - name: grupo_condicional
+        description: Nome do setor a ser usado para o join interno na consulta.
+      - name: filial_no_request
         in: query
         type: string
         required: false
-        description: Modificador de grupo, aplicado se usado junto com o código do setor.
-      - name: filial_condicional
+        description: Nome da filial condicional para aplicar o filtro na consulta.
+      - name: grupo_no_request
         in: query
         type: string
         required: false
-        description: Modificador de Filial, aplicado se usado junto com o código do setor.
+        description: Nome do grupo condicional para aplicar o filtro na consulta.
       - name: grupo_padrao
         in: query
         type: string
-        required: true
-        description: Nome do grupo padrão a ser aplicado nos setores.
-      - name: filial_padrao
+        required: false
+        description: Nome do grupo padrão a ser aplicado na consulta, se desejado.
+      - name: setor_filial_filtro
         in: query
         type: string
         required: true
-        description: Nome da filial padrão a ser aplicado nos setores.
+        description: Filtro obrigatório para ser aplicado especificamente à filial do setor.
+      - name: setor_grupo_filtro
+        in: query
+        type: string
+        required: true
+        description: Filtro obrigatório para ser aplicado especificamente ao grupo do setor.
     responses:
       200:
-        description: Retorna a Lista de Setores.
+        description: Retorna a Lista de Setores com a consulta SQL e os dados serializados em JSON.
       400:
         description: Erro de validação dos parâmetros de entrada. Verifique os valores informados.
         examples:
           application/json: { "Erro": "Descrição detalhada do erro de validação" }
       500:
-        description: Erro ao executar a consulta na base de dados. Pode ser devido a problemas de conexão ou erros internos do servidor.
+        description: Erro ao executar a consulta na base de dados.
         examples:
-          application/json: { "Erro": "Erro interno do servidor. Tente novamente mais tarde ou contate o suporte técnico." }
+          application/json: { "Erro": "Erro. Tente novamente mais tarde ou contate o suporte técnico." }
     """
     try:
+        print(request.args)
         # Parse dos parâmetros da query string
-        parametros = {
-            "setor_codigo_opcional": request.args.get('setor_codigo_opcional'),
-            "grupo_condicional": request.args.get('grupo_condicional'),
-            "filial_condicional": request.args.get('filial_condicional'),
-            "grupo_padrao": request.args.get('grupo_padrao'),
-            "filial_padrao": request.args.get('filial_padrao')
-        }
+        setor_no_request = request.args.get('setor_no_request')
+        filial_no_request = request.args.get('filial_no_request')
+        grupo_no_request = request.args.get('grupo_no_request')
+        grupo_padrao = request.args.get('grupo_padrao')
 
-        # Faz a validação dos parâmetros obrigatórios aqui
-        if not parametros["grupo_padrao"] or not parametros["filial_padrao"]:
-            return jsonify(message="O 'grupo_padrao' e 'Filial_padrao' são parâmetros obrigatórios."), 400
+        # Captura e validação dos parâmetros obrigatórios setor_filial_filtro e setor_grupo_filtro
+        setor_filial_filtro = request.args.get('setor_filial_filtro')
+        setor_grupo_filtro = request.args.get('setor_grupo_filtro')
 
-        # Executa a função de serviço e retorna a resposta
-        resultado = FilialService.executar_e_serializar_query(**parametros)
-        return jsonify(message="Consulta executada com sucesso!", resultado=resultado)
+        if not setor_filial_filtro or not setor_grupo_filtro:
+            return jsonify(
+                {"Erro": "Os parâmetros 'setor_filial_filtro' e 'setor_grupo_filtro' são obrigatórios."}), 400
+
+        # Executa a função de serviço e retorna a resposta.
+        resultado = SetorLogic.listar_setores(
+            setor_recebido=setor_no_request,
+            filial_condicional=filial_no_request,
+            grupo_condicional=grupo_no_request,
+            grupo_padrao=grupo_padrao,
+            setor_filial_filtro=setor_filial_filtro,
+            setor_grupo_filtro=setor_grupo_filtro
+        )
+        return jsonify({"message": "Consulta executada com sucesso!", "resultado": resultado}), 200
 
     except ValueError as e:
         # Isso captura as exceções de validação
-        return jsonify(message=str(e)), 400
+        return jsonify({"Erro": str(e)}), 400
     except Exception as e:
         # Qualquer outro erro que possa ocorrer
-        return jsonify(message="Erro ao executar a consulta", erro=str(e)), 500
+        return jsonify({"Erro": "Erro ao executar a consulta", "erro": str(e)}), 500
 
 
 @blueprint_filial.route('/filial/listar', methods=['GET'])
