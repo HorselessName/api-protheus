@@ -53,15 +53,17 @@ def get_equipamentos():
               type: string
               description: Mensagem de erro
     """
-    filial = request.args.get('filial').strip()
-    setor = request.args.get('setor').strip()
+    filial = request.args.get('filial', '').strip()
+    setor = request.args.get('setor', '').strip()
 
-    print(f"Requests Recebidos: {request.args}")
+    print(f"\n----> Requests Recebidos: {filial}, {setor} <----\n")
 
     if not filial or not setor:
         return jsonify(error="Os campos 'filial' e 'setor' são obrigatórios."), 400
 
     lista_equipamentos, error = EquipamentoService.fetch_equipamentos(filial_id=filial, setor_id=setor)
+    print(f"\n----> __ ROTA EQUIPAMENTOS __: Equipamentos Retornados da Service <----\n"
+          f"{lista_equipamentos}\n{'-' * 100}\n")
     if error:
         return jsonify(error="Erro ao buscar equipamentos no banco de dados.", details=error), 500
     return jsonify(resultado=lista_equipamentos)
