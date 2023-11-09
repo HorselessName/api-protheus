@@ -21,6 +21,8 @@ Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`
 Instalar utilizando o pipenv, para melhor gerenciamento das dependencias.
 Executar de fora do venv, dentro da pasta do projeto via terminal.
 
+Se todas estiverem instaladas, e seu Pipfile.lock estiver configurado, você roda só `pipenv install`
+
 - SQLAlchemy: `pipenv install SQLAlchemy`
 - Flask: `pipenv install Flask`
 - Mashmallow: `pipenv install marshmallow`
