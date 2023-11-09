@@ -14,7 +14,6 @@ Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`
 ## Instaladas Globalmente
 - Instalar o Virtual Env: `pip install --upgrade virtualenv`
 - Criar o environment: `virtualenv .venv`
-- Ativar o Environment: `.\.venv\Scripts\activate`
 - Instalar o SetupTools: `pip install --upgrade setuptools`
 - Gerenciador de pacotes: `pip install pipenv`
 
