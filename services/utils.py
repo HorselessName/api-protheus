@@ -3,8 +3,16 @@ import re
 # == Validações ==
 
 
+import re
+
+
 def validar_filial(filial: str) -> (bool, str):
+    # Verifica se há caracteres que não são dígitos
     if not bool(re.match("^[0-9]+$", filial)):
+        if any(char.isalpha() for char in filial):  # Verifica se contém letras
+            return False, "A filial deve conter apenas números, e você informou letras."
+        if ' ' in filial:  # Verifica se contém espaços
+            return False, "A filial deve conter apenas números, mas você está enviando espaços."
         return False, "A filial deve conter apenas números."
     return True, ""
 
