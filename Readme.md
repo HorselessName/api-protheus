@@ -14,13 +14,14 @@ Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`
 ## Instaladas Globalmente
 - Instalar o Virtual Env: `pip install --upgrade virtualenv`
 - Criar o environment: `virtualenv .venv`
-- Ativar o Environment: `.\.venv\Scripts\activate`
 - Instalar o SetupTools: `pip install --upgrade setuptools`
 - Gerenciador de pacotes: `pip install pipenv`
 
 ## Instalada no Virtual Environment
 Instalar utilizando o pipenv, para melhor gerenciamento das dependencias.
 Executar de fora do venv, dentro da pasta do projeto via terminal.
+
+Se todas estiverem instaladas, e seu Pipfile.lock estiver configurado, você roda só `pipenv install`
 
 - SQLAlchemy: `pipenv install SQLAlchemy`
 - Flask: `pipenv install Flask`
@@ -33,6 +34,7 @@ Executar de fora do venv, dentro da pasta do projeto via terminal.
 - Python DOT Env para variaveis de ambiente: `pipenv install python-dotenv`
 - Flask CORS para permitir acesso externo: `pipenv install flask-cors`
 
+Após instalar os pacotes, você precisa configurar o seu arquivo .env com suas informações de acessos do seu Banco de Dados SQL Server.
 # Entitades
 
 Entidades mapeadas para utilizar a API do Protheus.
