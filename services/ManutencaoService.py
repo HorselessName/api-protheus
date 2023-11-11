@@ -40,8 +40,10 @@ class ManutencaoService:
                 Solicitacao.D_E_L_E_T_ != '*'
             ).all()
 
-            if not solicitacoes:
-                return [], "Não existe nenhuma solicitação aberta para a filial e equipamento fornecidos.", False
+            possui_ss_aberta = len(solicitacoes) > 0
+
+            if not possui_ss_aberta:
+                return [], None, possui_ss_aberta
 
             print(f"----- Solicitações: Passo 1 -----\n"
                   f"Usando o Marshmallow para converter as solicitações para JSON...\n"
@@ -53,12 +55,11 @@ class ManutencaoService:
                 print("-" * 30)
                 print(f"Solicitações serializadas: {solicitacoes_json}")
 
+                return solicitacoes_json, None, possui_ss_aberta
+
             except ValueError as ve:
                 print(f"Erro ao serializar as solicitações: {ve}")
                 return None, f"Erro ao serializar as solicitações: {ve}", False
-
-            possui_ss_aberta = len(solicitacoes) > 0
-            return solicitacoes_json, None, possui_ss_aberta
 
         except OperationalError as e:
             return None, str(e), False
