@@ -28,6 +28,7 @@ class ManutencaoService:
             return None, message, None
 
         try:
+            print("Fazendo o SELECT com os valores: ", filial, equipamento)
             solicitacoes = Solicitacao.query.filter(
                 Solicitacao.solicitacao_filial == filial,
                 Solicitacao.solicitacao_equipamento == equipamento,
@@ -37,6 +38,8 @@ class ManutencaoService:
                 ),
                 Solicitacao.D_E_L_E_T_ != '*'
             ).all()
+
+            print("Solicitações encontradas: ", solicitacoes)
 
             possui_ss_aberta = len(solicitacoes) > 0
 

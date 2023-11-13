@@ -52,6 +52,8 @@ def get_solicitacao():
     filial = request.args.get('filial')
     equipamento = request.args.get('equipamento')
 
+    print("Request Recebido para Ver se tem S.S. aebrta para. Args: ", filial, equipamento)
+
     if not filial or not equipamento:
         return jsonify(error="Os campos 'filial' e 'equipamento' são obrigatórios."), 400
 
