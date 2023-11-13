@@ -4,6 +4,7 @@ from sqlalchemy.exc import OperationalError
 from models import Solicitacao
 from .utils import validar_filial, validar_equipamento
 from schemas import SolicitacaoSchema
+from sqlalchemy import or_
 
 
 class ManutencaoService:
@@ -12,13 +13,7 @@ class ManutencaoService:
     def buscar_solicitacoes_abertas(filial: str, equipamento: str):
         """
         Busca as solicitações de manutenção abertas com base na filial e no equipamento fornecidos.
-
-        Exemplo do SQL gerado:
-        SELECT * FROM SOLICITACOES WHERE
-            solicitacao_filial = 'XXXX' AND
-            solicitacao_equipamento = 'YYYY' AND
-            solicitacao_status = 'A' AND
-            D_E_L_E_T_ <> '*';
+        Tem S.S. aberta se a "Solicitação Status" tem os seguintes valores: A, D
 
         :param filial: ID da filial.
         :param equipamento: ID do equipamento.
@@ -36,7 +31,10 @@ class ManutencaoService:
             solicitacoes = Solicitacao.query.filter(
                 Solicitacao.solicitacao_filial == filial,
                 Solicitacao.solicitacao_equipamento == equipamento,
-                Solicitacao.solicitacao_status == 'A',
+                or_(
+                    Solicitacao.solicitacao_status == 'A',
+                    Solicitacao.solicitacao_status == 'D'
+                ),
                 Solicitacao.D_E_L_E_T_ != '*'
             ).all()
 
