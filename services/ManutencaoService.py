@@ -37,30 +37,34 @@ class ManutencaoService:
                     Solicitacao.solicitacao_status == 'D'
                 ),
                 Solicitacao.D_E_L_E_T_ != '*'
-            ).all()
+            )
 
-            print("Solicitações encontradas: ", solicitacoes)
-
-            possui_ss_aberta = len(solicitacoes) > 0
+            # Lógica da Query e Dados separados para montar o SQL no JSON.
+            solicitacoes_dados = solicitacoes.all()
+            possui_ss_aberta = len(solicitacoes_dados) > 0
 
             if not possui_ss_aberta:
-                return [], None, possui_ss_aberta
+                return None, [], False, None  # Quatro valores pra evitar erro expected 4, got 3 arguments.
 
             print(f"----- Solicitações: Passo 1 -----\n"
                   f"Usando o Marshmallow para converter as solicitações para JSON...\n"
-                  f"Solicitações brutos: {solicitacoes}")
+                  f"Solicitações brutos: {solicitacoes_dados}")
+
+            # Converter a query em uma string SQL
+            query_str = str(solicitacoes.statement.compile(compile_kwargs={"literal_binds": True}))
+            print(f"\n{'-' * 50}\n----> Query SQL Executada: <----\n{query_str}\n{'-' * 50}\n")
 
             try:
                 solicitacao_schema = SolicitacaoSchema(many=True)
-                solicitacoes_json = solicitacao_schema.dump(solicitacoes)
+                solicitacoes_json = solicitacao_schema.dump(solicitacoes_dados)
                 print("-" * 30)
                 print(f"Solicitações serializadas: {solicitacoes_json}")
 
-                return solicitacoes_json, None, possui_ss_aberta
+                return query_str, solicitacoes_json, possui_ss_aberta, None
 
             except ValueError as ve:
                 print(f"Erro ao serializar as solicitações: {ve}")
-                return None, f"Erro ao serializar as solicitações: {ve}", False
+                return None, None, False, f"Erro ao serializar as solicitações: {ve}"
 
         except OperationalError as e:
-            return None, str(e), False
+            return None, None, False, str(e)

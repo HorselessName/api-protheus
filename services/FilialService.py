@@ -103,6 +103,8 @@ class SetorLogic:
         subquery = query.subquery("TABELA_SETORES")
         consultar_setores = db_sql.session.query(subquery)
 
+        print(f"Subquery e Setores Consultados: \n\nSQL #### {subquery} \n\nSetores #### {consultar_setores}\n\n")
+
         # Aplicar filtros conjuntamente, usando a cláusula AND
         consulta_externa = consultar_setores.filter(
             (subquery.c.setor_filial == setor_filial_filtro) &

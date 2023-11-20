@@ -67,3 +67,23 @@ def get_equipamentos():
     if error:
         return jsonify(error="Erro ao buscar equipamentos no banco de dados.", details=error), 500
     return jsonify(resultado=lista_equipamentos)
+
+
+@blueprint_equipamentos.route('/equipamentos_ss', methods=['GET'])
+def get_equipamentos_ss():
+    filial = request.args.get('filial', '').strip()
+    setor = request.args.get('setor', '').strip()
+
+    print(f"\n----> Requests Recebidos para Equipamentos com Status de SS: {filial}, {setor} <----\n")
+
+    if not filial or not setor:
+        return jsonify(error="Os campos 'filial' e 'setor' são obrigatórios."), 400
+
+    equipamentos_com_status, error = EquipamentoService.fetch_equipamentos_e_ss(filial_id=filial, setor_id=setor)
+    print(f"\n----> __ ROTA EQUIPAMENTOS COM STATUS SS __: Equipamentos Retornados da Service <----\n"
+          f"{equipamentos_com_status}\n{'-' * 100}\n")
+    if error:
+        return jsonify(error="Erro ao buscar equipamentos com status de SS no banco de dados.", details=error), 500
+
+    return jsonify(resultado=equipamentos_com_status)
+

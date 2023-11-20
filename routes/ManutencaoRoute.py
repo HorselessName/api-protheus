@@ -57,14 +57,20 @@ def get_solicitacao():
     if not filial or not equipamento:
         return jsonify(error="Os campos 'filial' e 'equipamento' são obrigatórios."), 400
 
-    solicitacoes, mensagem_erro, possui_ss_aberta = ManutencaoService.buscar_solicitacoes_abertas(
+    sql, solicitacoes, possui_ss_aberta, mensagem_erro = ManutencaoService.buscar_solicitacoes_abertas(
         filial=filial,
         equipamento=equipamento)
 
     if mensagem_erro:
-        return jsonify({"possui_ss_aberta": False, "mensagem": mensagem_erro}), 400
+        return jsonify({
+            "possui_ss_aberta": False,
+            "mensagem": mensagem_erro
+        }), 400
 
-    response_data = {"possui_ss_aberta": possui_ss_aberta}
+    response_data = {
+        "possui_ss_aberta": possui_ss_aberta,
+        "sql": sql
+    }
 
     if possui_ss_aberta:
         response_data["solicitacoes"] = solicitacoes
