@@ -44,6 +44,7 @@ API é Somente Leitura e feita para ser GET apenas.
 
 ## Referencias
 
+[API reference TOTVS](https://api.totvs.com.br/)
 [Layout da Tabela de Bens](https://shorturl.at/tvF19)
 
 # Próximos Passos
