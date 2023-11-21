@@ -116,7 +116,7 @@ class SetorLogic:
         dados_json = setor_schema.dump(
             consulta_externa.all())  # Use .all() para executar a consulta e retornar os resultados
 
-        # Converte a consulta para uma string, substituindo os placeholders pelas strings informadas
+        # Query SQL: Trás os Setores (Famílias).
         query_str = str(consulta_externa.statement.compile(compile_kwargs={"literal_binds": True}))
 
         # Retornar a query e os dados em um JSON

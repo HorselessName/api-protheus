@@ -45,6 +45,7 @@ class EquipamentoService:
 
             print(f"\n---->Primeiro Item da lista de Equipamentos Encontrados: {equipamentos_json[0]}\n")
 
+            # Query SQL: Trás os Equipamentos.
             query_str = str(query.statement.compile(compile_kwargs={"literal_binds": True}))
             print(f"\n{'-' * 50}\n----> Query Final que foi executada: <----\n{query_str}\n{'-' * 50}\n")
 
@@ -69,17 +70,21 @@ class EquipamentoService:
             return None, {"error": f"Erro no setor: {message_setor}"}
 
         try:
-            # Montando a Query com Outer Join p/ já informar se tem uma S.S. aberta ou não para o equipamento.
+            # Montando a Query com Outer Join para já informar se tem uma S.S. aberta ou não para o equipamento,
+            # e qual a prioridade da S.S. se houver.
             query = (Equipamento.query.add_columns(
                 case(
                     (func.count(Solicitacao.solicitacao_id) > 0, 'true'),
                     else_='false'
-                ).label('possui_ss_aberta')
+                ).label('possui_ss_aberta'),
+                case(
+                    (func.count(Solicitacao.solicitacao_id) > 0, Solicitacao.solicitacao_prioridade),
+                    else_='0'
+                ).label('prioridade_ss')
             ).outerjoin(Solicitacao, and_(
                 Equipamento.equipamento_id == Solicitacao.solicitacao_equipamento,
                 Equipamento.equipamento_filial == Solicitacao.solicitacao_filial,
                 or_(
-                    # Status das Solicitações, de acordo com a Doc. do Protheus
                     Solicitacao.solicitacao_status == 'A',
                     Solicitacao.solicitacao_status == 'D'
                 ),
@@ -103,6 +108,8 @@ class EquipamentoService:
             # Motivo: Função agregada opera em um conjunto de linhas (agrupadas) e o SQL
             # precisa saber como tratar as colunas que não fazem parte dessa agregação.
             # Precisa aplicar em todas as colunas do SELECT, mesmo que elas não sejam usadas posteriormente.
+            # Também precisa acrescentar os valores no Grupo By sempre que tentar acessar diretamente valores,
+            # mesmo que de outras Models (Exemplo: Como no Outer Join acima.)
             equipamentos_com_status_ss = query.group_by(
                 Equipamento.equipamento_id,
                 Equipamento.equipamento_filial,
@@ -110,7 +117,8 @@ class EquipamentoService:
                 Equipamento.equipamento_nome,
                 Equipamento.equipamento_ccusto,
                 Equipamento.D_E_L_E_T_,
-                Equipamento.T9_STATUS
+                Equipamento.T9_STATUS,
+                Solicitacao.solicitacao_prioridade  # Correção do Erro Column 'TQB010.TQB_PRIORI' is invalid
             ).order_by(Equipamento.equipamento_id).all()
 
             print("\n >> Resultado da Consulta (Antes da Serialização): << \n")
@@ -123,18 +131,23 @@ class EquipamentoService:
             equipamento_schema = EquipamentoSchema(many=True)
             equipamentos_json = equipamento_schema.dump([e[0] for e in equipamentos_com_status_ss], many=True)
 
-            # Adicionando manualmente o campo possui_ss_aberta
-            for equipamento_serializado, equipamento_tuple in zip(equipamentos_json,
-                                                                  equipamentos_com_status_ss):
+            # Valores Opcionais e Novos, precisam ser tratados seguindo o seguinte fluxo:
+            # 1. Adicionar e mapear os valores no Schema que o Marshmallow vai usar.
+            # 2. Usar a lógica abaixo pra serializar o novo campo manualmente.
+            for equipamento_serializado, equipamento_tuple in zip(
+                    equipamentos_json, equipamentos_com_status_ss):
                 equipamento_serializado['possui_ss_aberta'] = equipamento_tuple[1]
+                equipamento_serializado['prioridade_ss'] = equipamento_tuple[2]
 
             print("\n >> Resultado Após Serialização pelo Marshmallow: << \n")
             print(equipamentos_json)
 
             print(f"\n---->Primeiro Item da lista de Equipamentos Encontrados: {equipamentos_json[0]}\n")
 
+            # Query SQL: Trás os Equipamentos e se tem S.S. Aberta.
             query_str = str(query.statement.compile(compile_kwargs={"literal_binds": True}))
-            print(f"\n{'-' * 50}\n----> Query Final que foi executada: <----\n{query_str}\n{'-' * 50}\n")
+            print(f"\n{'-' * 50}\n----> "
+                  f"Query Final que foi executada (Equipamentos SS)): <----\n{query_str}\n{'-' * 50}\n")
 
             response_data = {
                 "sql": query_str,
