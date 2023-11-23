@@ -10,12 +10,13 @@ serializar os dados.
 
 # Dependencies / Installation
 Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`
+No Linux, fazer o PipEnv criar o VENV no Projeto: `export PIPENV_VENV_IN_PROJECT=1`
 
 ## Instaladas Globalmente
 - Instalar o Virtual Env: `pip install --upgrade virtualenv`
-- Criar o environment: `virtualenv .venv`
 - Instalar o SetupTools: `pip install --upgrade setuptools`
 - Gerenciador de pacotes: `pip install pipenv`
+- Instalar o VENV com o PIPENV: `pipenv install`
 
 ## Instalada no Virtual Environment
 Instalar utilizando o pipenv, para melhor gerenciamento das dependencias.
@@ -35,6 +36,8 @@ Se todas estiverem instaladas, e seu Pipfile.lock estiver configurado, você rod
 - Flask CORS para permitir acesso externo: `pipenv install flask-cors`
 
 Após instalar os pacotes, você precisa configurar o seu arquivo .env com suas informações de acessos do seu Banco de Dados SQL Server.
+- Rodar o Aplicativo: `pipenv run python main.py`
+
 # Entitades
 
 Entidades mapeadas para utilizar a API do Protheus.
