@@ -38,6 +38,15 @@ Se todas estiverem instaladas, e seu Pipfile.lock estiver configurado, você rod
 Após instalar os pacotes, você precisa configurar o seu arquivo .env com suas informações de acessos do seu Banco de Dados SQL Server.
 - Rodar o Aplicativo: `pipenv run python main.py`
 
+Exemplo de arquivo de config, `.env`:
+```
+# Conexões SQL Server
+SQL_SERVER_HOST="IP do Servidor"
+SQL_SERVER_DATABASE="Banco de Dados SQL"
+SQL_SERVER_USER="Usuário do Banco"
+SQL_SERVER_PASSWORD="Senha de Acesso"
+```
+
 # Entitades
 
 Entidades mapeadas para utilizar a API do Protheus.
