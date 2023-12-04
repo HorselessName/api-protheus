@@ -1,5 +1,3 @@
-import re
-
 # == Validações ==
 
 
@@ -33,3 +31,22 @@ def validar_grupo(grupo: str) -> (bool, str):
     if not re.match("^[a-zA-Z0-9]+$", grupo):
         return False, "O grupo não deve conter espaços ou caracteres especiais."
     return True, grupo.upper()
+
+
+# == Tratativas de Strings ==
+
+def format_sql_query(query):
+    try:
+        # Gerar a string SQL bruta
+        raw_sql = str(query.statement.compile(compile_kwargs={"literal_binds": True}))
+
+        # Formatar a string SQL para melhor legibilidade
+        formatted_sql = raw_sql.replace("\\n", "\n").replace("\\t", "\t").replace('\\"', '"')
+
+        # Retornar a SQL formatada
+        return formatted_sql
+
+    except Exception as e:
+        # Tratar exceções gerais, como uma consulta SQL vazia ou erros de formatação
+        print(f"Erro ao formatar a consulta SQL: {e}")
+        return "Erro ao gerar a consulta SQL."

@@ -2,7 +2,7 @@
 
 from sqlalchemy.exc import OperationalError
 from models import Solicitacao
-from .utils import validar_filial, validar_equipamento
+from .utils import validar_filial, validar_equipamento, format_sql_query
 from schemas import SolicitacaoSchema
 from sqlalchemy import or_
 
@@ -43,16 +43,13 @@ class ManutencaoService:
             solicitacoes_dados = solicitacoes.all()
             possui_ss_aberta = len(solicitacoes_dados) > 0
 
-            if not possui_ss_aberta:
-                return None, [], False, None  # Quatro valores pra evitar erro expected 4, got 3 arguments.
-
-            print(f"----- Solicitações: Passo 1 -----\n"
-                  f"Usando o Marshmallow para converter as solicitações para JSON...\n"
-                  f"Solicitações brutos: {solicitacoes_dados}")
-
-            # Converter a query em uma string SQL
-            query_str = str(solicitacoes.statement.compile(compile_kwargs={"literal_binds": True}))
+            # Query SQL: Solicitacoes do Equipamento.
+            query_str = format_sql_query(solicitacoes)
             print(f"\n{'-' * 50}\n----> Query SQL Executada: <----\n{query_str}\n{'-' * 50}\n")
+
+            if not possui_ss_aberta:
+                # Retorna a string SQL mesmo quando não há solicitações abertas
+                return query_str, [], False, None
 
             try:
                 solicitacao_schema = SolicitacaoSchema(many=True)
