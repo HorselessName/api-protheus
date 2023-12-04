@@ -71,6 +71,61 @@ def get_equipamentos():
 
 @blueprint_equipamentos.route('/equipamentos_ss', methods=['GET'])
 def get_equipamentos_ss():
+    """
+    Lista todos os equipamentos cadastrados com base na filial e no setor fornecidos,
+    incluindo informação sobre se o equipamento possui solicitação de serviço (SS) aberta.
+    ---
+    tags:
+      - Equipamentos
+    parameters:
+      - name: filial
+        in: query
+        type: string
+        required: true
+        description: Filial do equipamento
+        default: '020101'
+      - name: setor
+        in: query
+        type: string
+        required: true
+        description: Setor do equipamento
+        default: 'GENERI'
+    responses:
+      200:
+        description: Lista de equipamentos com status de SS
+        schema:
+          id: EquipamentosSS
+          properties:
+            equipamento_id:
+              type: integer
+              description: ID do equipamento
+            equipamento_filial:
+              type: string
+              description: Filial do equipamento
+            equipamento_setor:
+              type: string
+              description: Setor do equipamento
+            equipamento_nome:
+              type: string
+              description: Nome do equipamento
+            equipamento_ccusto:
+              type: string
+              description: Centro de custo do equipamento
+            possui_ss_aberta:
+              type: string
+              description: Informa se o equipamento possui solicitação de serviço aberta ('true' ou 'false')
+            prioridade_ss:
+              type: string
+              description: Prioridade da S.S. atual do equipamento.
+      400:
+        description: Requisição inválida (parâmetros faltando)
+        schema:
+          id: Error
+          properties:
+            error:
+              type: string
+              description: Mensagem de erro
+    """
     filial = request.args.get('filial', '').strip()
     setor = request.args.get('setor', '').strip()
 
