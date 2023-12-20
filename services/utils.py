@@ -50,3 +50,17 @@ def format_sql_query(query):
         # Tratar exceções gerais, como uma consulta SQL vazia ou erros de formatação
         print(f"Erro ao formatar a consulta SQL: {e}")
         return "Erro ao gerar a consulta SQL."
+
+
+def validar_status(status: str) -> bool:
+    """
+    Valida se o status fornecido segue o padrão 'A,B,C' (sem espaços) e contém apenas caracteres seguros.
+
+    :param status: A string de status a ser validada.
+    :return: True se o status é válido, False caso contrário.
+    """
+    # Regex para verificar se o status segue o padrão 'A,B,C' e contém apenas caracteres alfabéticos e vírgulas
+    padrao = re.compile(r'^[A-Z](,[A-Z])*$')
+
+    # Verifica se o status corresponde ao padrão regex
+    return bool(padrao.match(status))
