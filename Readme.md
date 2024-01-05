@@ -8,17 +8,23 @@ A API foi desenvolvida seguindo padrões de orientação a objeto, para facilita
 fornecer a abstração de dados. Ela utiliza o SQLAlchemy para mapear as entidades e o Marshmallow do Flask para
 serializar os dados.
 
-# Instalação Automática (Com Docker Composer e DockerFile)
+# Instalação Automática 
+
+Com Docker Composer e DockerFile.
 
 ## Pré-Requisitos:
 - Docker Instalado.
 - Docker Composer Instalado.
 - Arquivo .env do Docker Composer configurado com as variáveis de configuração.
-  - VOLUME_PATH_LOGS: Pasta de Logs da Aplicação.
-  - VOLUME_PATH_APP: Pasta da Aplicação.
+  - VOLUME_PATH_APP: Pasta da Aplicação. Não use aspas no Linux. Ex: Use `/mnt/dados/db`
   - API_PORT: Porta da API.
   - API_HOST: Endereço que a API vai rodar.
 - Pastas com Permissões e Usuários Configuradas p/ o Docker não ter problemas de permissões.
+- Volumes que irão mapear os dados pelo `.env` devem estar criados e com permissões p/ o Docker.
+
+## Comando para Instalar
+
+Após cumprir os Pré-Requisitos, dentro do projeto que contém o Dockerfile, executar: `docker-compose up -d`
 
 # Instalação Manual
 
@@ -66,6 +72,8 @@ SQL_SERVER_DATABASE="Banco de Dados SQL"
 SQL_SERVER_USER="Usuário do Banco"
 SQL_SERVER_PASSWORD="Senha de Acesso"
 ```
+
+PS - Se quiser remover tudo e tentar novamente: `docker container rm api_protheus -f ; docker volume rm apisimplify_vol_api_protheus apisimplify_vol_api_logs api-protheus_vol_api_logs api-protheus_vol_api_protheus ; docker volume prune -f ; docker rmi teste apisimplify-api-protheus api-protheus_api-protheus`
 
 # Entitades
 
