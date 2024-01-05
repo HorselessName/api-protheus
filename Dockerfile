@@ -45,7 +45,8 @@ RUN pip install --upgrade setuptools pipenv
 RUN pipenv install --system --deploy --ignore-pipfile
 
 # Comando a Ser Executado quando o Container Inicia.
-# ENTRYPOINT ["python"]
-# CMD ["main.py"]
+ENTRYPOINT ["python"]
+CMD ["main.py"]
 
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+# Para Testes:
+# ENTRYPOINT ["tail", "-f", "/dev/null"]
