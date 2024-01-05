@@ -44,7 +44,14 @@ RUN pip install --upgrade setuptools pipenv
 # Instalação de Dependencias, Sincronizar o Pipfile com o Pipfile.lock, Ignora o Pipfile e usa o Pipfile.lock.
 RUN pipenv install --system --deploy --ignore-pipfile
 
-# Comando a Ser Executado quando o Container Inicia.
+# Cria um usuário não-root chamado 'appuser' e define a propriedade do diretório /app para esse usuário
+RUN adduser --disabled-password --gecos "" --uid 10000 api_protheus
+RUN chown -R api_protheus:api_protheus /app
+
+# Muda para o usuário não-root
+USER api_protheus
+
+# Comando a Ser Executado quando o Container Inicia como Não-Root
 ENTRYPOINT ["python"]
 CMD ["main.py"]
 
