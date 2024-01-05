@@ -8,7 +8,9 @@ A API foi desenvolvida seguindo padrões de orientação a objeto, para facilita
 fornecer a abstração de dados. Ela utiliza o SQLAlchemy para mapear as entidades e o Marshmallow do Flask para
 serializar os dados.
 
-# Instalação Automática (Com Docker Composer e DockerFile)
+# Instalação Automática 
+
+Com Docker Composer e DockerFile.
 
 ## Pré-Requisitos:
 - Docker Instalado.
@@ -19,6 +21,7 @@ serializar os dados.
   - API_PORT: Porta da API.
   - API_HOST: Endereço que a API vai rodar.
 - Pastas com Permissões e Usuários Configuradas p/ o Docker não ter problemas de permissões.
+- Volumes que irão mapear os dados pelo `.env` devem estar criados e com permissões p/ o Docker.
 
 ## Comando para Instalar
 
