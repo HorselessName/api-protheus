@@ -71,6 +71,8 @@ SQL_SERVER_USER="Usuário do Banco"
 SQL_SERVER_PASSWORD="Senha de Acesso"
 ```
 
+PS - Se quiser remover tudo e tentar novamente: `docker container rm api_protheus -f ; docker volume rm apisimplify_vol_api_protheus ; docker volume rm apisimplify_vol_api_logs ; docker volume prune -f ; docker rmi teste apisimplify-api-protheus`
+
 # Entitades
 
 Entidades mapeadas para utilizar a API do Protheus.
