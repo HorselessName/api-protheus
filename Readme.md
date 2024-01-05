@@ -17,6 +17,7 @@ serializar os dados.
   - VOLUME_PATH_LOGS: Pasta de Logs da Aplicação.
   - VOLUME_PATH_APP: Pasta da Aplicação.
   - API_PORT: Porta da API.
+  - API_HOST: Endereço que a API vai rodar.
 - Pastas com Permissões e Usuários Configuradas p/ o Docker não ter problemas de permissões.
 
 # Instalação Manual
@@ -57,7 +58,7 @@ Se todas estiverem instaladas, e seu Pipfile.lock estiver configurado, você rod
 Após instalar os pacotes, você precisa configurar o seu arquivo .env com suas informações de acessos do seu Banco de Dados SQL Server.
 - Rodar o Aplicativo: `pipenv run python main.py`
 
-Exemplo de arquivo de config, `.env`:
+Arquivo de config do app, `.env` dentro de `src`:
 ```
 # Conexões SQL Server
 SQL_SERVER_HOST="IP do Servidor"
