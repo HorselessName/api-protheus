@@ -16,7 +16,7 @@ Com Docker Composer e DockerFile.
 - Docker Instalado.
 - Docker Composer Instalado.
 - Arquivo .env do Docker Composer configurado com as variáveis de configuração.
-  - VOLUME_PATH_APP: Pasta da Aplicação.
+  - VOLUME_PATH_APP: Pasta da Aplicação. Não use aspas no Linux. Ex: Use `/mnt/dados/db`
   - API_PORT: Porta da API.
   - API_HOST: Endereço que a API vai rodar.
 - Pastas com Permissões e Usuários Configuradas p/ o Docker não ter problemas de permissões.
