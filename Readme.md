@@ -8,7 +8,20 @@ A API foi desenvolvida seguindo padrões de orientação a objeto, para facilita
 fornecer a abstração de dados. Ela utiliza o SQLAlchemy para mapear as entidades e o Marshmallow do Flask para
 serializar os dados.
 
-# Dependencies / Installation
+# Instalação Automática (Com Docker Composer e DockerFile)
+
+## Pré-Requisitos:
+- Docker Instalado.
+- Docker Composer Instalado.
+- Arquivo .env do Docker Composer configurado com as variáveis de configuração.
+  - VOLUME_PATH_LOGS: Pasta de Logs da Aplicação.
+  - VOLUME_PATH_APP: Pasta da Aplicação.
+  - API_PORT: Porta da API.
+- Pastas com Permissões e Usuários Configuradas p/ o Docker não ter problemas de permissões.
+
+# Instalação Manual
+
+## Dependencies / Installation
 Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`.
 No Linux, você precisa fazer o PipEnv criar o VENV no Projeto: `export PIPENV_VENV_IN_PROJECT=1`
 
@@ -16,7 +29,13 @@ No Linux, você precisa fazer o PipEnv criar o VENV no Projeto: `export PIPENV_V
 - Instalar o Virtual Env: `pip install --upgrade virtualenv`
 - Instalar o SetupTools: `pip install --upgrade setuptools`
 - Gerenciador de pacotes: `pip install pipenv`
-- Instalar o VENV com o PIPENV: `pipenv install`
+
+- Instalar o VENV com o PIPENV:
+  - Configurar para fazer o VENV Local.
+    - Linux: `export PIPENV_VENV_IN_PROJECT=1`
+    - Windows - CMD: `set PIPENV_VENV_IN_PROJECT=1`
+    - Windows - PowerShell: `$env:PIPENV_VENV_IN_PROJECT=1`
+  - Instalar o VENV com o PIPENV: `pipenv install`
 
 ## Instalada no Virtual Environment
 Instalar utilizando o pipenv, para melhor gerenciamento das dependencias.

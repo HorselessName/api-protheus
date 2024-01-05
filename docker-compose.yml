@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  api-protheus:
+    container_name: api_protheus
+    build: .
+    volumes:
+      - vol_api_protheus:/app
+    ports:
+      - "127.0.0.1:${API_PORT}:5000"
+
+volumes:
+  vol_api_protheus:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOLUME_PATH_APP}
+  vol_api_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOLUME_PATH_LOGS}

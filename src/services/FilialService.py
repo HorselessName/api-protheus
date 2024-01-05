@@ -10,8 +10,8 @@ from db_context import db_sql
 from schemas import SetorSchema, FilialSchema
 
 # Importar classes do SQLAlchemy para construirmos as lógicas condicionais.
-from sqlalchemy import case, literal_column
-from sqlalchemy.exc import SQLAlchemyError, OperationalError
+from sqlalchemy import case
+from sqlalchemy.exc import OperationalError
 
 # Importar o Aliased do SQLAlchemy para construirmos as lógicas condicionais.
 from sqlalchemy.orm import aliased
