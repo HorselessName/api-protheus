@@ -16,7 +16,6 @@ Com Docker Composer e DockerFile.
 - Docker Instalado.
 - Docker Composer Instalado.
 - Arquivo .env do Docker Composer configurado com as variáveis de configuração.
-  - VOLUME_PATH_LOGS: Pasta de Logs da Aplicação.
   - VOLUME_PATH_APP: Pasta da Aplicação.
   - API_PORT: Porta da API.
   - API_HOST: Endereço que a API vai rodar.
