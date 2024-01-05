@@ -20,6 +20,10 @@ serializar os dados.
   - API_HOST: Endereço que a API vai rodar.
 - Pastas com Permissões e Usuários Configuradas p/ o Docker não ter problemas de permissões.
 
+## Comando para Instalar
+
+Após cumprir os Pré-Requisitos, dentro do projeto que contém o Dockerfile, executar: `docker-compose up -d`
+
 # Instalação Manual
 
 ## Dependencies / Installation
