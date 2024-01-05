@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.7'
 services:
   api-protheus:
     container_name: api_protheus
@@ -11,14 +11,9 @@ services:
 
 volumes:
   vol_api_protheus:
+    name: vol_api_protheus
     driver: local
     driver_opts:
       type: none
       o: bind
       device: ${VOLUME_PATH_APP}
-  vol_api_logs:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${VOLUME_PATH_LOGS}
