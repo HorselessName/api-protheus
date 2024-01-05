@@ -9,8 +9,8 @@ fornecer a abstração de dados. Ela utiliza o SQLAlchemy para mapear as entidad
 serializar os dados.
 
 # Dependencies / Installation
-Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`
-No Linux, fazer o PipEnv criar o VENV no Projeto: `export PIPENV_VENV_IN_PROJECT=1`
+Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`.
+No Linux, você precisa fazer o PipEnv criar o VENV no Projeto: `export PIPENV_VENV_IN_PROJECT=1`
 
 ## Instaladas Globalmente
 - Instalar o Virtual Env: `pip install --upgrade virtualenv`
