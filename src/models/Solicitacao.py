@@ -10,6 +10,16 @@ from db_context import db_sql
 
 @dataclass
 class Solicitacao(db_sql.Model):
+    """
+    Esse modelo de classe representa uma solicitação retornada após uma query.
+    A Solicitação de Serviço tem algumas propriedades importantes, e elas tem algumas funções.
+    São elas:
+
+    - Status da S.S.: Pode ser A ou D, indica "Análise" ou "Distribuída". Após encerrada, se torna "E".
+    - Prioridade da S.S.: Pode ser 1, 2 ou 3. 1 é a prioridade mais alta, 3 é a mais baixa.
+    - Origem: Vai trazer a informação se a S.S. foi aberta manual ou pelo app.
+    - Tipo: Vai trazer o tipo de serviço que foi solicitado.
+    """
     __tablename__ = 'TQB010'  # Tabela de S.S. - Protheus.
 
     solicitacao_id: Mapped[str] = mapped_column("TQB_SOLICI", db_sql.String, primary_key=True)
@@ -17,6 +27,9 @@ class Solicitacao(db_sql.Model):
     solicitacao_equipamento: Mapped[str] = mapped_column("TQB_CODBEM", db_sql.String, nullable=False)
     solicitacao_status: Mapped[str] = mapped_column("TQB_SOLUCA", db_sql.String, nullable=False)
     solicitacao_prioridade: Mapped[str] = mapped_column("TQB_PRIORI", db_sql.String, nullable=False, default="1")
+    solicitacao_origin: Mapped[str] = mapped_column("TQB_ORIGEM", db_sql.String, nullable=False)
+    solicitacao_descricao: Mapped[str] = mapped_column("TQB_DESCSS", db_sql.String, nullable=False)
+    solicitacao_tipo: Mapped[str] = mapped_column("TQB_CDSERV", db_sql.String, nullable=False)
     D_E_L_E_T_: Mapped[str] = mapped_column(db_sql.String, nullable=True)
 
     def to_dict(self):
