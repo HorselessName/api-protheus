@@ -30,6 +30,11 @@ class Solicitacao(db_sql.Model):
     solicitacao_origin: Mapped[str] = mapped_column("TQB_ORIGEM", db_sql.String, nullable=False)
     solicitacao_descricao: Mapped[str] = mapped_column("TQB_DESCSS", db_sql.String, nullable=False)
     solicitacao_tipo: Mapped[str] = mapped_column("TQB_CDSERV", db_sql.String, nullable=False)
+    solicitacao_databer: Mapped[str] = mapped_column("", db_sql.String, nullable=True)
+    solicitacao_datafec: Mapped[str] = mapped_column("", db_sql.String, nullable=True)
+    solicitacao_horaber: Mapped[str] = mapped_column("", db_sql.String, nullable=True)
+    solicitacao_horafec: Mapped[str] = mapped_column("", db_sql.String, nullable=True)
+    solicitacao_tempo: Mapped[str] = mapped_column("", db_sql.String, nullable=True)
     D_E_L_E_T_: Mapped[str] = mapped_column(db_sql.String, nullable=True)
 
     def to_dict(self):
