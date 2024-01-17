@@ -1,4 +1,4 @@
 from .Equipamento import Equipamento
 from .Filial import Filial
-from .Solicitacao import Solicitacao
+from .Solicitacao import Solicitacao, SolicitacaoDescricao
 from .Setor import Setor

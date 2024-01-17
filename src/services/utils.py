@@ -2,6 +2,8 @@
 
 
 import re
+from datetime import datetime
+from typing import Tuple
 
 
 def validar_filial(filial: str) -> (bool, str):
@@ -15,22 +17,16 @@ def validar_filial(filial: str) -> (bool, str):
     return True, ""
 
 
-def validar_setor(setor: str) -> (bool, str):
-    if " " in setor or not re.match("^[a-zA-Z0-9]*$", setor):
-        return False, "O setor não deve conter espaços ou caracteres especiais."
-    return True, setor.upper()
+def validar_caracteres(texto: str, nome_campo: str) -> (bool, str):
+    """
+    Valida se o texto fornecido não contém espaços ou caracteres especiais.
+    Retorna um booleano indicando se a validação foi bem-sucedida e o texto validado ou uma mensagem de erro.
 
-
-def validar_equipamento(equipamento: str) -> (bool, str):
-    if not bool(re.match("^[a-zA-Z0-9]+$", equipamento)):
-        return False, "O equipamento não deve conter caracteres especiais ou espaços."
-    return True, equipamento.upper()
-
-
-def validar_grupo(grupo: str) -> (bool, str):
-    if not re.match("^[a-zA-Z0-9]+$", grupo):
-        return False, "O grupo não deve conter espaços ou caracteres especiais."
-    return True, grupo.upper()
+    Abro Exceção para as vírgulas pois uso elas pra lidar com valores que vem de uma lista.
+    """
+    if " " in texto or not re.match("^[a-zA-Z0-9,]*$", texto):
+        return False, f"O {nome_campo} não deve conter espaços ou caracteres especiais."
+    return True, texto.upper()
 
 
 # == Tratativas de Strings ==
@@ -54,13 +50,61 @@ def format_sql_query(query):
 
 def validar_status(status: str) -> bool:
     """
-    Valida se o status fornecido segue o padrão 'A,B,C' (sem espaços) e contém apenas caracteres seguros.
+    This function validates the status provided by the user. The status should follow the pattern 'A,B,C' (without
+    spaces) and should only contain safe characters. The function returns True if the status is valid,
+    and False otherwise.
 
-    :param status: A string de status a ser validada.
-    :return: True se o status é válido, False caso contrário.
+    :param status: A string representing the status to be validated. The status should be a comma-separated string
+                   without spaces, containing only the characters 'A', 'E', 'C', and 'D'. Each character can only appear
+                   once in the status string.
+
+    :return: A boolean value indicating whether the status is valid. Returns True if the status is valid (i.e., it follows
+             the required pattern and only contains safe characters). Returns False otherwise.
+
+    Usage:
+    >>> validar_status('A,B,C')
+    False
+    >>> validar_status('A,E,C,D')
+    True
+    >>> validar_status('A,B,C,D,D')
+    False
+    >>> validar_status('A,D,C,E')
+    True
     """
-    # Regex para verificar se o status segue o padrão 'A,B,C' e contém apenas caracteres alfabéticos e vírgulas
-    padrao = re.compile(r'^[A-Z](,[A-Z])*$')
 
-    # Verifica se o status corresponde ao padrão regex
-    return bool(padrao.match(status))
+    print("\n----- Utils: Validando Status -----\n")
+
+    caracteres_validos = ['A', 'C', 'D', 'E']
+    caracteres_status = status.split(',')
+
+    if (all(caractere in caracteres_validos for caractere in caracteres_status) and
+            len(set(caracteres_status)) == len(caracteres_status) and
+            1 <= len(caracteres_status) <= 4):
+        return True
+    else:
+        return False
+
+
+def validar_data_between(data: str) -> bool | tuple[bool, str]:
+    """
+    Verifica e valida se a data recebida é "ANOMESDIA,ANOMESDIA" e se o intervalo é válido.
+    Converte somente valores no formato "YYYYMMDD,YYYYMMDD" (Ex: 20240115,20240130)
+    """
+
+    print("\n----- Utils: Validando Data Between -----\n")
+
+    try:
+        data_inicio, data_fim = data.split(',')
+        data_inicio = datetime.strptime(data_inicio, '%Y%m%d')
+        data_fim = datetime.strptime(data_fim, '%Y%m%d')
+
+        # Se a data de início for maior, geramos um Throw Error.
+        if data_inicio > data_fim:
+            raise ValueError("Data inicial não pode ser maior ou igual à data final.")
+
+        return True, data
+
+    # Se o formato de data foi passado de forma errada, vai dar um Except e retornar um False.
+    except (ValueError, AttributeError) as erro_data:
+        return False, f"Data inicial deve ser menor que a final, formato correto é 'ANOMESDIA,ANOMESDIA', {erro_data}"
+    pass

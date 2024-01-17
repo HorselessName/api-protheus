@@ -2,7 +2,7 @@
 
 from sqlalchemy.exc import OperationalError
 from models import Solicitacao
-from .utils import validar_filial, validar_equipamento, format_sql_query
+from .utils import validar_filial, validar_caracteres, format_sql_query
 from schemas import SolicitacaoSchema
 from sqlalchemy import or_
 
@@ -68,7 +68,7 @@ class ManutencaoService:
         if not is_valid:
             return None, message, None
 
-        is_valid, message = validar_equipamento(equipamento)
+        is_valid, message = validar_caracteres(equipamento)
         if not is_valid:
             return None, message, None
 

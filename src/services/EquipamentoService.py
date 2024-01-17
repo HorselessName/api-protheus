@@ -3,7 +3,7 @@
 from sqlalchemy.exc import OperationalError
 from sqlalchemy import or_, func, case, and_
 from models import Equipamento, Solicitacao
-from .utils import validar_filial, validar_setor
+from .utils import validar_filial, validar_caracteres
 from schemas import EquipamentoSchema
 
 
@@ -16,14 +16,12 @@ class EquipamentoService:
         if not is_valid_filial:
             return None, {"error": f"Erro na filial: {message_filial}"}
 
-        is_valid_setor, message_setor = validar_setor(setor_id)
+        is_valid_setor, message_setor = validar_caracteres(setor_id)
         if not is_valid_setor:
             return None, {"error": f"Erro no setor: {message_setor}"}
 
         try:
-            # Montando a Query com Outer Join p/ já informar se tem uma S.S. aberta ou não para o equipamento.
             query = Equipamento.query.filter(Equipamento.D_E_L_E_T_ != '*').filter(Equipamento.T9_STATUS == '01')
-
             print("\n----> Montando a Query para os Filtros de Filial e Setor <----")
 
             if filial_id:
@@ -65,7 +63,7 @@ class EquipamentoService:
         if not is_valid_filial:
             return None, {"error": f"Erro na filial: {message_filial}"}
 
-        is_valid_setor, message_setor = validar_setor(setor_id)
+        is_valid_setor, message_setor = validar_caracteres(setor_id)
         if not is_valid_setor:
             return None, {"error": f"Erro no setor: {message_setor}"}
 
