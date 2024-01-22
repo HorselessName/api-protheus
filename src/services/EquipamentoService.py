@@ -59,11 +59,13 @@ class EquipamentoService:
 
     @staticmethod
     def fetch_equipamentos_e_ss(filial_id=None, setor_id=None):
+        print("----> Verificando se os Equipamentos tem SS, para visualização dinâmica <----\n")
         is_valid_filial, message_filial = validar_filial(filial_id)
         if not is_valid_filial:
             return None, {"error": f"Erro na filial: {message_filial}"}
 
-        is_valid_setor, message_setor = validar_caracteres(setor_id)
+        print(f"----> Filial Válida: {filial_id}; Validando os Caracteres... <----\n")
+        is_valid_setor, message_setor = validar_caracteres(setor_id, "setor_id")
         if not is_valid_setor:
             return None, {"error": f"Erro no setor: {message_setor}"}
 

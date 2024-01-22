@@ -17,7 +17,7 @@ def validar_filial(filial: str) -> (bool, str):
     return True, ""
 
 
-def validar_caracteres(texto: str, nome_campo: str) -> (bool, str):
+def validar_caracteres(texto: str, nome_campo: str = None) -> (bool, str):
     """
     Valida se o texto fornecido não contém espaços ou caracteres especiais.
     Retorna um booleano indicando se a validação foi bem-sucedida e o texto validado ou uma mensagem de erro.
@@ -25,7 +25,10 @@ def validar_caracteres(texto: str, nome_campo: str) -> (bool, str):
     Abro Exceção para as vírgulas pois uso elas pra lidar com valores que vem de uma lista.
     """
     if " " in texto or not re.match("^[a-zA-Z0-9,]*$", texto):
-        return False, f"O {nome_campo} não deve conter espaços ou caracteres especiais."
+        if nome_campo:
+            return False, f"O {nome_campo} não deve conter espaços ou caracteres especiais."
+        else:
+            return False, "O texto não deve conter espaços ou caracteres especiais."
     return True, texto.upper()
 
 
@@ -108,3 +111,21 @@ def validar_data_between(data: str) -> bool | tuple[bool, str]:
     except (ValueError, AttributeError) as erro_data:
         return False, f"Data inicial deve ser menor que a final, formato correto é 'ANOMESDIA,ANOMESDIA', {erro_data}"
     pass
+
+
+# == Verificação de Dados Recebidos ==
+def verificar_asterisco(valor):
+    """
+    Verifica se o valor é um asterisco, indicando que todos os valores devem ser considerados.
+    """
+    return re.match(r"^[*]?$", valor)
+
+
+def valores_por_virgula(valor):
+    """
+    Verifica se o valor contém vários valores separados por vírgula.
+    Retorna uma lista dos valores separados ou None se não houver vírgula.
+    """
+    if "," in valor:
+        return valor.split(",")
+    return None

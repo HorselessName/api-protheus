@@ -317,12 +317,15 @@ def get_solicitacoes():
                 if not validar_status(valor):
                     return jsonify({'erro': 'Formato de status inválido. Valores e Formato: A,D,E,C.'}), 400
 
-    print(f"{'#' * 50} Fim do Tratamento de Dados da Lista de Solicitações {'#' * 50}\n")
+    print("# 5 - Enviando os Argumentos Validados p/ a Service de Solicitacoes: ", argumentos_validos)
 
-    lista_de_solicitacoes = SolicitacaoService.get_descriptions("000136")
+    try:
+        print("\n-- Route: Chamando a Service de Solicitacoes")
+        SolicitacaoService.get_all_solicitacoes(**argumentos_validos)
 
-    return jsonify(
-        argumentos_validos
-    )
+        return ""
+    except Exception as e:
+        print(f"Erro ao processar as solicitações na Get Solicitacoes: {e}")
+        return jsonify({'error': 'Erro interno do servidor'}), 500
 
     pass

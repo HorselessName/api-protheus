@@ -8,3 +8,6 @@ def initialize_routes(app):
     from routes.FilialRoute import blueprint_filial
     app.register_blueprint(blueprint_filial)
 
+    from routes.ExecutorRoute import blueprint_executores
+    app.register_blueprint(blueprint_executores)
+
