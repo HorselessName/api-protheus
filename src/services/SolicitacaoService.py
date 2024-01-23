@@ -1,28 +1,11 @@
 # == Solicitação Service ==
 import json
-import re
 
 from models import Solicitacao
 from services.utils import valores_por_virgula, verificar_asterisco
 
 
 class SolicitacaoService:
-    @staticmethod
-    def get_solicitacoes(solicitacao_filial: str,
-                         solicitacao_status: str,
-                         solicitacao_tipo: str,
-                         solicitacao_equipamento: str,
-                         data_between: str):
-        # Trago todas as solicitações, sem filtro.
-        # 1. Crio a Query apenas.
-        todas_solicitacoes = Solicitacao.query.filter(Solicitacao.D_E_L_E_T_ != '*')
-        print(f"\n{'-' * 50}\n----> Query Todas as Solicitações: <----\n{todas_solicitacoes}\n{'-' * 50}\n")
-
-        # 2. Executo a Query.
-        todas_solicitacoes = todas_solicitacoes.all()
-        print(f"\n{'-' * 50}\n----> Todas as Solicitações: <----\n{todas_solicitacoes}\n{'-' * 50}\n")
-
-        pass
 
     @staticmethod
     def get_all_solicitacoes(solicitacao_filial,
@@ -78,5 +61,22 @@ class SolicitacaoService:
             print(json.dumps(solicitacao.to_dict(), indent=4))
 
         print("----> End of Descriptions List <----\n")
+
+        pass
+
+    @staticmethod
+    def get_solicitacoes(solicitacao_filial: str,
+                         solicitacao_status: str,
+                         solicitacao_tipo: str,
+                         solicitacao_equipamento: str,
+                         data_between: str):
+        # Trago todas as solicitações, sem filtro.
+        # 1. Crio a Query apenas.
+        todas_solicitacoes = Solicitacao.query.filter(Solicitacao.D_E_L_E_T_ != '*')
+        print(f"\n{'-' * 50}\n----> Query Todas as Solicitações: <----\n{todas_solicitacoes}\n{'-' * 50}\n")
+
+        # 2. Executo a Query.
+        todas_solicitacoes = todas_solicitacoes.all()
+        print(f"\n{'-' * 50}\n----> Todas as Solicitações: <----\n{todas_solicitacoes}\n{'-' * 50}\n")
 
         pass

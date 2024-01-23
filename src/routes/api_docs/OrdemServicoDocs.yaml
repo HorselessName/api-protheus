@@ -1,0 +1,76 @@
+Trás a Lista de Ordens de Serviço, de acordo com a S.S. informada.
+---
+tags:
+  - Ordens de Serviço
+parameters:
+  - name: ordem_codsolicitacao
+    in: query
+    type: string
+    required: true
+    description: Código da Solicitação de Serviço (TJ_SOLICI)
+responses:
+  200:
+    description: Uma lista de Ordens de Serviço vinculadas a S.S. Informada.
+    schema:
+      type: array
+      items:
+        $ref: '#/definitions/OrdemServico'
+  400:
+    description: Parâmetros inválidos.
+  500:
+    description: Erro interno do servidor.
+definitions:
+  OrdemServico:
+    type: object
+    properties:
+      ordem_id:
+        type: string
+        description: ID da Ordem de Serviço
+      ordem_equipamento:
+        type: string
+        description: Equipamento da Ordem de Serviço
+      ordem_filial:
+        type: string
+        description: Filial que a O.S. foi aberta
+      ordem_cod_servico:
+        type: string
+        description: Código do Serviço sendo executado
+      ordem_data_ultima_manutencao:
+        type: string
+        description: Data da ultima manutencao feita no equipamento
+      ordem_data_prevista:
+        type: string
+        description: Data prevista para caso agendamento
+      ordem_hora_prevista:
+        type: string
+        description: Hora prevista para caso de agendamento
+      ordem_data_abertura:
+        type: string
+        description: Data de abertura da O.S.
+      ordem_hora_abertura:
+        type: string
+        description: Hora de abertura da O.S.
+      ordem_data_inicio_atendimento:
+        type: string
+        description: Data de inicio do atendimento, que o tecnico começou a trabalhar na O.S.
+      ordem_hora_inicio_atendimento:
+        type: string
+        description: Hora de inicio do atendimento, que o tecnico começou a trabalhar na O.S.
+      ordem_data_fim_atendimento:
+        type: string
+        description: Data de fim do atendimento, que o tecnico terminou de trabalhar na O.S.
+      ordem_hora_fim_atendimento:
+        type: string
+        description: Hora de fim do atendimento, que o tecnico terminou de trabalhar na O.S.
+      ordem_ultima_alteracao:
+        type: string
+        description: Usuário que fez a ultima alteração na O.S.
+      ordem_codsetor:
+        type: string
+        description: Código do setor que a O.S. foi aberta
+      ordem_observacao:
+        type: string
+        description: Campo de Observação da O.S.
+      ordem_codsolicitacao:
+        type: string
+        description: Código da Solicitação de Serviço (TJ_SOLICI)

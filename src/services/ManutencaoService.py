@@ -2,7 +2,7 @@
 
 from sqlalchemy.exc import OperationalError
 from models import Solicitacao
-from .utils import validar_filial, validar_caracteres, format_sql_query
+from .utils import validar_numeros, validar_caracteres, format_sql_query
 from schemas import SolicitacaoSchema
 from sqlalchemy import or_
 
@@ -18,7 +18,7 @@ class ManutencaoService:
         :param status:
         :return:
         """
-        isvalid, message = validar_filial(filial)
+        isvalid, message = validar_numeros(filial)
         if not isvalid:
             return None, message
 
@@ -64,7 +64,7 @@ class ManutencaoService:
         :param equipamento: ID do equipamento.
         :return: Uma lista das solicitações, mensagem de erro (se houver) e um booleano indicando se há solicitações abertas.
         """
-        is_valid, message = validar_filial(filial)
+        is_valid, message = validar_numeros(filial)
         if not is_valid:
             return None, message, None
 

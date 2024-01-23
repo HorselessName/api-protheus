@@ -3,15 +3,16 @@
 
 import re
 from datetime import datetime
-from typing import Tuple
 
 
-def validar_filial(filial: str) -> (bool, str):
-    # Verifica se há caracteres que não são dígitos
-    if not bool(re.match("^[0-9]+$", filial)):
-        if any(char.isalpha() for char in filial):  # Verifica se contém letras
+def validar_numeros(numeros: str) -> (bool, str):
+    """
+    O método verifica se o valor contém apenas números e se o tamanho é igual a 6.
+    """
+    if not bool(re.match("^[0-9]+$", numeros)):
+        if any(char.isalpha() for char in numeros):  # Verifica se contém letras
             return False, "A filial deve conter apenas números, e você informou letras."
-        if ' ' in filial:  # Verifica se contém espaços
+        if ' ' in numeros:  # Verifica se contém espaços
             return False, "A filial deve conter apenas números, mas você está enviando espaços."
         return False, "A filial deve conter apenas números."
     return True, ""
@@ -35,12 +36,18 @@ def validar_caracteres(texto: str, nome_campo: str = None) -> (bool, str):
 # == Tratativas de Strings ==
 
 def format_sql_query(query):
+    """
+    Formata para uma string SQL legível uma consulta de SQL gerada pelo SQLAlchemy.
+    """
     try:
         # Gerar a string SQL bruta
         raw_sql = str(query.statement.compile(compile_kwargs={"literal_binds": True}))
 
         # Formatar a string SQL para melhor legibilidade
-        formatted_sql = raw_sql.replace("\\n", "\n").replace("\\t", "\t").replace('\\"', '"')
+        formatted_sql = (raw_sql
+                         .replace("\\n", "\n")
+                         .replace("\\t", "\t")
+                         .replace('\"', ""))
 
         # Retornar a SQL formatada
         return formatted_sql
