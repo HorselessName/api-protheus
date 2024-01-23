@@ -129,7 +129,7 @@ def get_equipamentos_ss():
     filial = request.args.get('filial', '').strip()
     setor = request.args.get('setor', '').strip()
 
-    print(f"\n----> Requests Recebidos para Equipamentos com Status de SS: {filial}, {setor} <----\n")
+    print(f"\n----> API Requests Recebidos para Equipamentos com Status de SS: {filial}, {setor} <----\n")
 
     if not filial or not setor:
         return jsonify(error="Os campos 'filial' e 'setor' são obrigatórios."), 400

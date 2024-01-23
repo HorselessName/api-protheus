@@ -1,0 +1,58 @@
+Retorna Informações sobre um executor informado.
+---
+tags:
+  - Executores
+parameters:
+  - name: executor_matricula
+    in: query
+    type: string
+    required: false
+    default: "*"
+    description: Código de Matrícula do Executor.
+responses:
+  200:
+    description: Um executor filtrado pela matricula informada.
+    schema:
+      properties:
+        executor:
+          type: object
+          $ref: '#/definitions/Executor'
+  400:
+    description: Parâmetros inválidos.
+  500:
+    description: Erro interno do servidor.
+definitions:
+  Executor:
+    type: object
+    properties:
+      executor_matricula:
+        type: string
+        description: Matrícula do executor
+      executor_filial:
+        type: string
+        description: Filial do executor
+      executor_nome:
+        type: string
+        description: Nome do executor
+      executor_email:
+        type: string
+        description: Email do executor
+      executor_usuario:
+        type: string
+        description: Usuário do executor
+      executor_ccusto:
+        type: string
+        description: Centro de custo do executor
+      executor_turno:
+        type: string
+        description: Turno do executor
+      executor_especialidades:
+        type: array
+        items:
+          $ref: '#/definitions/ExecutorEspecialidade'
+  ExecutorEspecialidade:
+    type: object
+    properties:
+      especialidade_nome:
+        type: string
+        description: Nome da especialidade

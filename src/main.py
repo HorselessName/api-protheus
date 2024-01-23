@@ -16,6 +16,7 @@ db_context.init_app(app)  # Isso inicializa o SQLAlchemy
 ma = Marshmallow(app)
 
 from routing import initialize_routes
+initialize_routes(app)
 
 
 @app.route('/', methods=['GET'])
@@ -24,5 +25,4 @@ def documentacao():
 
 
 if __name__ == '__main__':
-    initialize_routes(app)
     app.run(host='0.0.0.0', port=5000, debug=True)
