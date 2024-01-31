@@ -3,8 +3,11 @@
 from sqlalchemy.exc import OperationalError
 from sqlalchemy import or_, func, case, and_
 from models import Equipamento, Solicitacao
-from .utils import validar_filial, validar_caracteres
+from .utils import validar_numeros, validar_caracteres
 from schemas import EquipamentoSchema
+
+# TODO: Organizar por Ordem Alfabética.
+# TODO: Filtro de Pesquisa.
 
 
 class EquipamentoService:
@@ -12,7 +15,7 @@ class EquipamentoService:
     @staticmethod
     def fetch_equipamentos(filial_id=None, setor_id=None):
         print(f"\n----> Trazendo os Equipamentos da Filial {filial_id} e Setor {setor_id} <----\n")
-        is_valid_filial, message_filial = validar_filial(filial_id)
+        is_valid_filial, message_filial = validar_numeros(filial_id)
         if not is_valid_filial:
             return None, {"error": f"Erro na filial: {message_filial}"}
 
@@ -60,7 +63,7 @@ class EquipamentoService:
     @staticmethod
     def fetch_equipamentos_e_ss(filial_id=None, setor_id=None):
         print("----> Verificando se os Equipamentos tem SS, para visualização dinâmica <----\n")
-        is_valid_filial, message_filial = validar_filial(filial_id)
+        is_valid_filial, message_filial = validar_numeros(filial_id)
         if not is_valid_filial:
             return None, {"error": f"Erro na filial: {message_filial}"}
 

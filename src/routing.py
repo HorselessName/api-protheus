@@ -11,3 +11,5 @@ def initialize_routes(app):
     from routes.ExecutorRoute import blueprint_executores
     app.register_blueprint(blueprint_executores)
 
+    from routes.OrdemServicoRoute import blueprint_ordem_servico
+    app.register_blueprint(blueprint_ordem_servico)

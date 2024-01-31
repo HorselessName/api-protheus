@@ -141,4 +141,3 @@ def get_equipamentos_ss():
         return jsonify(error="Erro ao buscar equipamentos com status de SS no banco de dados.", details=error), 500
 
     return jsonify(resultado=equipamentos_com_status)
-

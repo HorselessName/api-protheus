@@ -22,4 +22,3 @@ class EquipamentoSchema(SQLAlchemyAutoSchema):
         else:
             # Se não houver S.S. aberta, retornar '0'
             return '0'
-
