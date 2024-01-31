@@ -35,6 +35,22 @@ class OrdemServicoSchema(SQLAlchemyAutoSchema):
     """
 
     ordem_insumos = fields.Nested(OrdemServicoInsumoSchema(many=True,))
+    ordem_prioridade = fields.Method("get_ordem_prioridade")
+    ordem_equipamento_nome = fields.Method("get_ordem_equipamento_nome")
+
+    @staticmethod
+    def get_ordem_prioridade(obj):
+        """
+        Método para ver a prioridade definida pela @Hybrid Property da Model da OrdemServico.
+        """
+        return obj.ordem_prioridade if obj.ordem_prioridade else None
+
+    @staticmethod
+    def get_ordem_equipamento_nome(obj):
+        """
+        Método para ver o nome do Equipamento da Ordem de Serviço.
+        """
+        return obj.ordem_equipamento_nome if obj.ordem_equipamento_nome else None
 
     class Meta:
         model = OrdemServico

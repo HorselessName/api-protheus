@@ -9,12 +9,16 @@ def validar_numeros(numeros: str) -> (bool, str):
     """
     O método verifica se o valor contém apenas números e se o tamanho é igual a 6.
     """
+    if len(numeros) != 6:
+        return False, "O código deve ter exatamente 6 dígitos."
+
     if not bool(re.match("^[0-9]+$", numeros)):
         if any(char.isalpha() for char in numeros):  # Verifica se contém letras
-            return False, "A filial deve conter apenas números, e você informou letras."
+            return False, "O código deve conter apenas números, e você informou letras."
         if ' ' in numeros:  # Verifica se contém espaços
-            return False, "A filial deve conter apenas números, mas você está enviando espaços."
-        return False, "A filial deve conter apenas números."
+            return False, "O código deve conter apenas números, mas você está enviando espaços."
+        return False, "O código deve conter apenas números."
+
     return True, ""
 
 
