@@ -22,6 +22,7 @@ Com Docker Composer e DockerFile.
 - Pastas com Permissões e Usuários Configuradas p/ o Docker não ter problemas de permissões.
 - Volumes que irão mapear os dados pelo `.env` devem estar criados e com permissões p/ o Docker.
 - Fazer o `git clone` do projeto dentro do volume do `docker`, usando o nome `api_protheus`. Ex: Se seu volume fica em `/mnt/dados/projetos`, você deve clonar fazendo `git clone <url> /mnt/dados/projetos/api_protheus`.
+- Importante: Não se esqueça do seu arquivo `.env`, senão a etapa seguinte vai apresentar erros.
 
 ## Comando para Instalar
 
