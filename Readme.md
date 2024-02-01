@@ -21,10 +21,12 @@ Com Docker Composer e DockerFile.
   - API_HOST: Endereço que a API vai rodar.
 - Pastas com Permissões e Usuários Configuradas p/ o Docker não ter problemas de permissões.
 - Volumes que irão mapear os dados pelo `.env` devem estar criados e com permissões p/ o Docker.
+- Fazer o `git clone` do projeto dentro do volume do `docker`, usando o nome `api_protheus`. Ex: Se seu volume fica em `/mnt/dados/projetos`, você deve clonar fazendo `git clone <url> /mnt/dados/projetos/api_protheus`.
+- Importante: Não se esqueça do seu arquivo `.env`, senão a etapa seguinte vai apresentar erros.
 
 ## Comando para Instalar
 
-Após cumprir os Pré-Requisitos, dentro do projeto que contém o Dockerfile, executar: `docker-compose up -d`
+Após cumprir os Pré-Requisitos, dentro do projeto que contém o Dockerfile, entre dentro dele e execute `docker-compose up -d`.
 
 # Instalação Manual
 
