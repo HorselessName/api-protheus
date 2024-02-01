@@ -57,6 +57,7 @@ Se todas estiverem instaladas, e seu Pipfile.lock estiver configurado, você rod
 - Flask Marshmallow: `pipenv install flask-marshmallow`
 - Flasgger for Swagger: `pipenv install flasgger`
 - PyODBC Driver do SQL Server: `pipenv install pyodbc`
+- Para o Driver do SQL funcinar, instale o UnixODBC: `apt install -y unixodbc`
 - Python DOT Env para variaveis de ambiente: `pipenv install python-dotenv`
 - Flask CORS para permitir acesso externo: `pipenv install flask-cors`
 
