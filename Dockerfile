@@ -29,7 +29,6 @@ COPY src/ /app/
 RUN apt update -y
 RUN apt install -y gcc apt-transport-https curl gnupg
 RUN apt install -y unixodbc-dev unixodbc
-RUN apt install -y git
 RUN apt clean -y
 
 # Fix (-fsSL) para "Signatures couldn't be verified because the public key is not available".
