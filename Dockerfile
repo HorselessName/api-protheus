@@ -23,7 +23,7 @@ ENV PYTHONUNBUFFERED=1
 
 # Copiar os arquivos Fonte p/ a pasta de Trabalho do Container.
 WORKDIR /app
-COPY src/ /app/
+COPY app/ /app/
 
 # PyODBC Dependencies + MS SQL Server ODBC Driver v17 (Ver Versão do Linux na Imagem usada.)
 RUN apt update -y
