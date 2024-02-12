@@ -5,60 +5,14 @@ from services.ManutencaoService import ManutencaoService  # Ajuste conforme sua 
 from services.SolicitacaoService import SolicitacaoService
 from services.utils import validar_status, validar_data_between, validar_caracteres
 
+from flasgger import swag_from
+
 blueprint_manutencao = Blueprint('manutencao', __name__)
 
 
 @blueprint_manutencao.route('/manutencao/solicitacao', methods=['GET'])
+@swag_from('./api_docs/GetSolicitacaoDocs.yaml')
 def get_solicitacao():
-    """
-    Lista as solicitações abertas para o Equipamento e Filial informada.
-    ---
-    tags:
-      - Solicitacoes
-    parameters:
-      - name: filial
-        in: query
-        type: string
-        required: true
-        description: Filial em que a S.S. está aberta.
-        default: '020101'
-      - name: equipamento
-        in: query
-        type: string
-        required: true
-        description: Identificação do bem qual deseja ver as solicitacoes.
-        default: 'DOC'
-    responses:
-      200:
-        description: Lista de solicitações
-        schema:
-          id: Solicitacoes
-          properties:
-            solicitacao_id:
-              type: integer
-              description: ID da solicitação
-            solicitacao_filial:
-                type: string
-                description: Filial da solicitação
-            solicitacao_equipamento:
-                type: string
-                description: Equipamento da solicitação
-            solicitacao_prioridade:
-                type: string
-                description: Prioridade da solicitação
-            solicitacao_status:
-                type: string
-                description: Status da solicitação
-      400:
-        description: Requisição inválida (parâmetros faltando)
-        schema:
-          id: Error
-          properties:
-            error:
-              type: string
-              description: Mensagem de erro
-    """
-
     filial = request.args.get('filial')
     equipamento = request.args.get('equipamento')
 
@@ -93,56 +47,8 @@ def get_solicitacao():
 # Rota pra trazer todas as solicitações de uma filial
 # Lista todas as solicitações de uma filial com base no status fornecido.
 @blueprint_manutencao.route('/manutencao/solicitacao/filial', methods=['GET'])
+@swag_from('./api_docs/SolicitacoesFilialDocs.yaml')
 def get_solicitacoes_filial():
-    """
-    Lista todas as solicitações de uma filial com base no status fornecido.
-    ---
-    tags:
-      - Solicitacoes
-    parameters:
-      - name: filial
-        in: query
-        type: string
-        required: true
-        description: Filial em que a S.S. está aberta.
-        default: '020101'
-      - name: status
-        in: query
-        type: string
-        required: true
-        description: Status da solicitação.
-        default: 'A'
-    responses:
-      200:
-        description: Lista de solicitações
-        schema:
-          id: Solicitacoes
-          properties:
-            solicitacao_id:
-              type: integer
-              description: ID da solicitação
-            solicitacao_filial:
-              type: string
-              description: Filial da solicitação
-            solicitacao_equipamento:
-              type: string
-              description: Equipamento da solicitação
-            solicitacao_prioridade:
-              type: string
-              description: Prioridade da solicitação
-            solicitacao_status:
-              type: string
-              description: Status da solicitação
-      400:
-        description: Requisição inválida (parâmetros faltando)
-        schema:
-          id: Error
-          properties:
-            error:
-              type: string
-              description: Mensagem de erro
-    """
-
     filial = request.args.get('filial')
     status = request.args.get('status')
 

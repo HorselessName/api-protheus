@@ -59,13 +59,13 @@ class Solicitacao(db_sql.Model):
     solicitacao_horaber: Mapped[str] = mapped_column("TQB_HOABER", db_sql.String, nullable=True)
     solicitacao_horafec: Mapped[str] = mapped_column("TQB_HOFECH", db_sql.String, nullable=True)
     solicitacao_tempo: Mapped[str] = mapped_column("TQB_TEMPO", db_sql.String, nullable=True)
+
     D_E_L_E_T_: Mapped[str] = mapped_column(db_sql.String, nullable=True)
 
     # Relacionamento 1..1 com a tabela SYP010.
     solicitacao_descricao_id: Mapped[str] = mapped_column("TQB_CODMSS", db_sql.String)
     solicitacao_descricao: Mapped[SolicitacaoDescricao] = relationship(
-        "SolicitacaoDescricao",
-        lazy="joined")
+        "SolicitacaoDescricao", lazy="joined")
 
     def to_dict(self):
         atributos_ignore = ['_sa_instance_state', 'D_E_L_E_T_', 'solicitacao_descricao_id']

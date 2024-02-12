@@ -1,31 +1,38 @@
-from marshmallow import fields
-from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from models import OrdemServico, OrdemServicoInsumo
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from marshmallow import fields
+from models import OrdemServicoInsumo
 
 
 class OrdemServicoInsumoSchema(SQLAlchemyAutoSchema):
     """
-    Schema do Marshmallow para Desserialização, com relacionamento Many to One com a O.S..
-    Representa os Insumos da Ordem de Serviço.
+    Schema do Marshmallow para Desserialização dos Insumos da Ordem de Serviço.
     """
 
-    executor_nome = fields.Method("get_executor_nome")
+    detalhes_insumo = fields.Method("get_detalhes_insumo")
 
     @staticmethod
-    def get_executor_nome(obj):
+    def get_detalhes_insumo(obj):
         """
-        Método para definir o Executor da O.S. de acordo com o tipo do Insumo.
-        Depende das Models também possuírem o Executor, caso contrário, retornará None.
+        Retorna detalhes do insumo com base no seu tipo.
         """
+        detalhes = {
+            "insumo_tipo": obj.insumo_tipo,
+            "insumo_codigo": obj.insumo_codigo,
+            "insumo_quantidade": obj.insumo_quantidade,
+            "insumo_unidade": obj.insumo_unidade,
+            "insumo_data_inicio": obj.insumo_data_inicio,
+            "insumo_hora_inicio": obj.insumo_hora_inicio
+        }
         if obj.insumo_tipo == "M":
-            return obj.executor.executor_nome if obj.executor else None
-        return None
+            detalhes["executor_nome"] = obj.executor.executor_nome if obj.executor else None
+        return detalhes
 
     class Meta:
         model = OrdemServicoInsumo
         load_instance = True
         include_fk = True
-        exclude = ("insumo_ordem_id", )
+        fields = ("detalhes_insumo", )
         ordered = True
 
 

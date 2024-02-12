@@ -1,0 +1,46 @@
+Lista as solicitações abertas para o Equipamento e Filial informada.
+---
+tags:
+  - Solicitacoes
+parameters:
+  - name: filial
+    in: query
+    type: string
+    required: true
+    description: Filial em que a S.S. está aberta.
+    default: '020101'
+  - name: equipamento
+    in: query
+    type: string
+    required: true
+    description: Identificação do bem qual deseja ver as solicitacoes.
+    default: 'DOC'
+responses:
+  200:
+    description: Lista de solicitações
+    schema:
+      id: Solicitacoes
+      properties:
+        solicitacao_id:
+          type: integer
+          description: ID da solicitação
+        solicitacao_filial:
+          type: string
+          description: Filial da solicitação
+        solicitacao_equipamento:
+          type: string
+          description: Equipamento da solicitação
+        solicitacao_prioridade:
+          type: string
+          description: Prioridade da solicitação
+        solicitacao_status:
+          type: string
+          description: Status da solicitação
+  400:
+    description: Requisição inválida (parâmetros faltando)
+    schema:
+      id: Error
+      properties:
+        error:
+          type: string
+          description: Mensagem de erro

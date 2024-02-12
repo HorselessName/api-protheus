@@ -1,0 +1,51 @@
+Trás a lista de insumos da Ordem de Serviço informada
+---
+tags:
+  - Ordens de Serviço
+parameters:
+  - name: ordem_id
+    in: path
+    type: string
+    required: true
+    description: Código numérico de 6 dígitos da Ordem de Serviço (TJ_ORDEM)
+    minLength: 6
+    maxLength: 6
+    pattern: '^\d{6}$'
+  - name: ordem_filial
+    in: query
+    type: string
+    required: true
+    description: Código da Filial (TJ_FILIAL)
+    minLength: 6
+    maxLength: 6
+responses:
+  200:
+    description: Lista de Insumos.
+    schema:
+      id: InsumosDaOS
+      properties:
+        insumos:
+          type: array
+          items:
+            type: object
+            properties:
+              insumo_tipo:
+                type: string
+                description: Código do tipo de insumo.
+              insumo_codigo:
+                type: string
+                description: Código do insumo utilizado na manutenção.
+              insumo_quantidade:
+                type: string
+                description: Quantidade de insumo utilizada.
+              insumo_unidade:
+                type: string
+                description: Unidade de consumo do recurso.
+              insumo_data_inicio:
+                type: string
+                description: Data inicial de previsão ou utilização do Insumo.
+              insumo_hora_inicio:
+                type: string
+                description: Hora inicial de previsão ou utilização do Insumo.
+  400:
+    description: Erro na Requisição

@@ -20,21 +20,31 @@ class OrdemServico(db_sql.Model):
     ordem_cod_servico: Mapped[str] = mapped_column('TJ_SERVICO', db_sql.String)
     ordem_data_ultima_manutencao: Mapped[str] = mapped_column('TJ_DTULTMA', db_sql.String)
 
-    # Valores Não Usados, mas mapeados para possíveis funcionalidades de agendamento.
+    # Valores Não Usados - Para Futuras Implementações de Agendamento.
     ordem_data_prevista: Mapped[str] = mapped_column('TJ_DTPPINI', db_sql.String)
     ordem_hora_prevista: Mapped[str] = mapped_column('TJ_HOPPINI', db_sql.String)
 
-    # Valores Preenchidos quando a O.S. é gerada.
-    ordem_data_abertura: Mapped[str] = mapped_column('TJ_DTMPINI', db_sql.String)
-    ordem_hora_abertura: Mapped[str] = mapped_column('TJ_HOMPINI', db_sql.String)
-
     # Valores Preenchidos quando o executor iniciar o atendimento.
-    ordem_data_inicio_atendimento: Mapped[str] = mapped_column('TJ_DTMRINI', db_sql.String)
-    ordem_hora_inicio_atendimento: Mapped[str] = mapped_column('TJ_HOMRINI', db_sql.String)
+    ordem_data_inicio_atendimento: Mapped[str] = mapped_column('TJ_DTPRINI', db_sql.String)
+    ordem_hora_inicio_atendimento: Mapped[str] = mapped_column('TJ_HOPRINI', db_sql.String)
 
     # Valores Preenchidos quando o executor finalizar o atendimento.
-    ordem_data_fim_atendimento: Mapped[str] = mapped_column('TJ_DTMRFIM', db_sql.String)
-    ordem_hora_fim_atendimento: Mapped[str] = mapped_column('TJ_HOMRFIM', db_sql.String)
+    ordem_data_fim_atendimento: Mapped[str] = mapped_column('TJ_DTPRFIM', db_sql.String)
+    ordem_hora_fim_atendimento: Mapped[str] = mapped_column('TJ_HOPRFIM', db_sql.String)
+
+    # Valores de data e hora previstos e reais para início e fim de manutenção (ajustes conforme SQL).
+    ordem_data_previsto_inicio_manutencao: Mapped[str] = mapped_column('TJ_DTMPINI', db_sql.String)
+    ordem_hora_previsto_inicio_manutencao: Mapped[str] = mapped_column('TJ_HOMPINI', db_sql.String)
+    ordem_data_previsto_fim_manutencao: Mapped[str] = mapped_column('TJ_DTMPFIM', db_sql.String)
+    ordem_hora_previsto_fim_manutencao: Mapped[str] = mapped_column('TJ_HOMPFIM', db_sql.String)
+    ordem_data_real_inicio_manutencao: Mapped[str] = mapped_column('TJ_DTMRINI', db_sql.String)
+    ordem_hora_real_inicio_manutencao: Mapped[str] = mapped_column('TJ_HOMRINI', db_sql.String)
+    ordem_data_real_fim_manutencao: Mapped[str] = mapped_column('TJ_DTMRFIM', db_sql.String)
+    ordem_hora_real_fim_manutencao: Mapped[str] = mapped_column('TJ_HOMRFIM', db_sql.String)
+
+    # Colunas para Filtro de O.S. abertas pelo APP.
+    ordem_horaco2: Mapped[str] = mapped_column('TJ_HORACO2', db_sql.String)
+    ordem_horaco1: Mapped[str] = mapped_column('TJ_HORACO1', db_sql.String)
 
     ordem_ultima_alteracao: Mapped[str] = mapped_column('TJ_USUARIO', db_sql.String)
     ordem_codsetor: Mapped[str] = mapped_column('TJ_CENTRAB', db_sql.String)
@@ -76,8 +86,45 @@ class OrdemServico(db_sql.Model):
 class OrdemServicoInsumo(db_sql.Model):
     __tablename__ = 'STL010'
 
-    insumo_ordem_id: Mapped[str] = mapped_column('TL_ORDEM', db_sql.String,
-                                                 ForeignKey(OrdemServico.ordem_id), primary_key=True)
+    # Campos da tabela, definidos de acordo com as colunas no banco...
+    # REF: https://docs.sqlalchemy.org/en/20/core/type_basics.html#sql-standard-and-multiple-vendor-uppercase-types
+
+    insumo_ordem_id: Mapped[str] = mapped_column('TL_ORDEM', db_sql.VARCHAR, ForeignKey(OrdemServico.ordem_id))
+    insumo_tarefa: Mapped[str] = mapped_column("TL_TAREFA", db_sql.VARCHAR)
+    insumo_usa_calendario: Mapped[str] = mapped_column("TL_USACALE", db_sql.VARCHAR)
+
+    insumo_quantidade_recomendada: Mapped[float] = mapped_column("TL_QUANREC", db_sql.Float)
+    insumo_quantidade: Mapped[float] = mapped_column("TL_QUANTID", db_sql.Float)
+
+    insumo_unidade: Mapped[str] = mapped_column("TL_UNIDADE", db_sql.VARCHAR)
+    insumo_destino: Mapped[str] = mapped_column("TL_DESTINO", db_sql.VARCHAR)
+
+    insumo_data_inicio: Mapped[str] = mapped_column("TL_DTINICI", db_sql.VARCHAR)
+    insumo_hora_inicio: Mapped[str] = mapped_column("TL_HOINICI", db_sql.VARCHAR)
+
+    insumo_almoxarifado: Mapped[str] = mapped_column("TL_LOCAL", db_sql.VARCHAR)
+    insumo_local_aplicacao: Mapped[str] = mapped_column("TL_LOCAPLI", db_sql.VARCHAR)
+    insumo_numero_sc: Mapped[str] = mapped_column("TL_NUMSC", db_sql.VARCHAR)
+    insumo_item_sc: Mapped[str] = mapped_column("TL_ITEMSC", db_sql.VARCHAR)
+
+    insumo_observacoes: Mapped[str] = mapped_column("TL_OBSERVA", db_sql.VARBINARY, nullable=True)
+
+    insumo_nota_fiscal: Mapped[str] = mapped_column("TL_NOTFIS", db_sql.VARCHAR)
+    insumo_serie: Mapped[str] = mapped_column("TL_SERIE", db_sql.VARCHAR)
+    insumo_fornecedor: Mapped[str] = mapped_column("TL_FORNEC", db_sql.VARCHAR)
+    insumo_loja: Mapped[str] = mapped_column("TL_LOJA", db_sql.VARCHAR)
+    insumo_numero_sa: Mapped[str] = mapped_column("TL_NUMSA", db_sql.VARCHAR)
+    insumo_item_sa: Mapped[str] = mapped_column("TL_ITEMSA", db_sql.VARCHAR)
+    insumo_sequencia_tarefa: Mapped[str] = mapped_column("TL_SEQTARE", db_sql.VARCHAR)
+    insumo_codigo_aen: Mapped[str] = mapped_column("TL_CODAEN", db_sql.VARCHAR)
+
+    insumo_codigo: Mapped[str] = mapped_column('TL_CODIGO', db_sql.VARCHAR, ForeignKey(Executor.executor_matricula), primary_key=True)
+
+    insumo_tipo: Mapped[str] = mapped_column('TL_TIPOREG', db_sql.VARCHAR)
+    insumo_filial: Mapped[str] = mapped_column('TL_FILIAL', db_sql.VARCHAR)
+
+    # ID do Insumo (Não pode ser 0)
+    R_E_C_N_O_: Mapped[str] = mapped_column('R_E_C_N_O_', db_sql.BIGINT)
 
     @hybrid_property
     def executor_nome(self):
@@ -85,9 +132,10 @@ class OrdemServicoInsumo(db_sql.Model):
             return self.executor.executor_nome
         return None
 
-    insumo_codigo: Mapped[str] = mapped_column('TL_CODIGO', db_sql.String,
-                                               ForeignKey(Executor.executor_matricula), primary_key=True)
-    insumo_tipo: Mapped[str] = mapped_column('TL_TIPOREG', db_sql.String)
+    @hybrid_property
+    def executor_codigo(self):
+        if self.insumo_tipo == "M":
+            return self.executor.executor_usuario
 
     ordem_vinculada: Mapped["OrdemServico"] = relationship(back_populates="ordem_insumos")
     executor: Mapped["Executor"] = relationship(

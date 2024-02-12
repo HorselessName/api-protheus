@@ -1,0 +1,71 @@
+Utilize essa rota para inserir um insumo na O.S.
+---
+tags:
+  - Ordens de Serviço
+parameters:
+  - name: ordem_id
+    in: path
+    type: string
+    required: true
+    description: Código numérico de 6 dígitos da Ordem de Serviço (TJ_ORDEM)
+    minLength: 6
+    maxLength: 6
+    pattern: '^\d{6}$'
+  - name: json_insumo
+    in: body
+    description: Objeto de insumo a ser incluído
+    required: true
+    schema:
+      $ref: '#/definitions/Insumo'
+consumes:
+  - application/json
+produces:
+  - application/json
+definitions:
+  Insumo:
+    type: object
+    required:
+      - insumo_quantidade
+      - insumo_unidade
+      - insumo_codigo
+      - insumo_tipo
+      - ordem_filial
+    properties:
+      insumo_quantidade:
+        type: string
+        description: Quantidade de insumo utilizada
+      insumo_unidade:
+        type: string
+        description: Unidade de consumo do recurso
+      insumo_codigo:
+        type: string
+        description: Código do insumo utilizado na manutenção
+      insumo_tipo:
+        type: string
+        description: Código do tipo de insumo
+      ordem_filial:
+        type: string
+        description: Código da Filial
+requestBody:
+  description: Objeto de insumo a ser incluído
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: '#/definitions/Insumo'
+responses:
+  200:
+    description: Insumo incluído com sucesso
+    schema:
+      type: object
+      properties:
+        mensagem:
+          type: string
+          example: "Insumo incluído com sucesso."
+  400:
+    description: Erro na solicitação
+    schema:
+      type: object
+      properties:
+        erro:
+          type: string
