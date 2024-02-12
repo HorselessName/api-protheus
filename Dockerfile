@@ -27,7 +27,7 @@ COPY app/ /app/
 
 # PyODBC Dependencies + MS SQL Server ODBC Driver v17 (Ver Versão do Linux na Imagem usada.)
 RUN apt update -y
-RUN apt install -y gcc apt-transport-https curl gnupg
+RUN apt install -y gcc apt-transport-https curl gnupg git
 RUN apt install -y unixodbc-dev unixodbc
 RUN apt clean -y
 
