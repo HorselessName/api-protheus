@@ -27,7 +27,7 @@ COPY app/ /app/
 
 # PyODBC Dependencies + MS SQL Server ODBC Driver v17 (Ver Versão do Linux na Imagem usada.)
 RUN apt update -y
-RUN apt install -y gcc apt-transport-https curl gnupg git
+RUN apt install -y gcc apt-transport-https curl gnupg
 RUN apt install -y unixodbc-dev unixodbc
 RUN apt clean -y
 
@@ -52,7 +52,7 @@ RUN chown -R api_protheus:api_protheus /app
 USER api_protheus
 
 # Comando a Ser Executado quando o Container Inicia como Não-Root
-ENTRYPOINT ["git pull && python"]
+ENTRYPOINT ["python"]
 CMD ["main.py"]
 
 # Para Testes:
