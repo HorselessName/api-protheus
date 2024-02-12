@@ -52,7 +52,7 @@ RUN chown -R api_protheus:api_protheus /app
 USER api_protheus
 
 # Comando a Ser Executado quando o Container Inicia como Não-Root
-ENTRYPOINT ["python"]
+ENTRYPOINT ["git pull && python"]
 CMD ["main.py"]
 
 # Para Testes:
