@@ -88,7 +88,7 @@ def validar_status(status: str) -> bool:
 
     print("\n----- Utils: Validando Status -----\n")
 
-    caracteres_validos = ['A', 'C', 'D', 'E']
+    caracteres_validos = ['A', 'C', 'D', 'E', 'S', 'V']
     caracteres_status = status.split(',')
 
     if (all(caractere in caracteres_validos for caractere in caracteres_status) and
@@ -140,3 +140,14 @@ def valores_por_virgula(valor):
     if "," in valor:
         return valor.split(",")
     return None
+
+
+def dois_caracteres_uppercase(lista_valores):
+    """
+    Verifica se cada string na lista tem exatamente 2 caracteres em UPPERCASE.
+    Retorna True se todos os valores satisfazem os critérios, False caso contrário.
+    """
+    for valor in lista_valores:
+        if not (valor.isupper() and len(valor) == 2):
+            return False
+    return True

@@ -13,3 +13,6 @@ def initialize_routes(app):
 
     from routes.OrdemServicoRoute import blueprint_ordem_servico
     app.register_blueprint(blueprint_ordem_servico)
+
+    from routes.ProdutoRoute import blueprint_produtos
+    app.register_blueprint(blueprint_produtos)

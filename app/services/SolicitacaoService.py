@@ -1,8 +1,15 @@
 # == Solicitação Service ==
 import json
 
+from flask import jsonify
+
 from models import Solicitacao
 from services.utils import valores_por_virgula, verificar_asterisco
+from services.OrdemServicoService import OrdemServicoService
+from typing import List, Union, Dict
+from schemas import SolicitacaoSchema
+
+SolicitacaoType = Union[Dict, SolicitacaoSchema]
 
 
 class SolicitacaoService:
@@ -16,7 +23,15 @@ class SolicitacaoService:
         """
         List a specific description of a request for service based on the provided description ID.
         :param solicitacao_filial: Filial da Solicitação.
-        :param solicitacao_status: Status da Solicitação (A - Em Análise, D - Distribuido, E - Encerrada, C - Cancelada.
+        :param solicitacao_status: Status da Solicitação
+
+        Possíveis Status para a S.S.:
+        - A - Em Análise,
+        - D - Distribuido, -- Neste status, é gerado uma O.S. ao distribuir.
+        - TODO: S - Em Serviço (Não tem por padrão, tem que criar em conjunto com as O.S. dela.)
+        - TODO: V - Em Validação (Não tem por padrão, tem que criar em conjunto com as O.S. dela.)
+        - E - Encerrada,
+        - C - Cancelada.
         :param solicitacao_tipo: Tipo da Solicitação (C - Corretiva, P - Preventiva).
         :param solicitacao_equipamento: Equipamento da Solicitação.
         :param data_between: Data da Solicitação.
@@ -80,3 +95,45 @@ class SolicitacaoService:
         print(f"\n{'-' * 50}\n----> Todas as Solicitações: <----\n{todas_solicitacoes}\n{'-' * 50}\n")
 
         pass
+
+    @staticmethod
+    def verificar_status_ss(solicitacoes: List[SolicitacaoType]):
+        """
+        Verifica os status de cada S.S. e atualiza o status no objeto sendo iterado, caso necessário.
+        TODO: Please, GitHub Copilot, fix the error "name 'SolicitacaoSchema' is not defined"
+
+        :param solicitacoes: Lista de Solicitações.
+        """
+        print("\n----> Service Solicitações: Verificando Status das S.S. <----")
+
+        # Para cada S.S., vou precisar ver se o status dela é "D" primeiro de tudo. Se não for "D", nem faço nada.
+        for solicitacao in solicitacoes:
+            if solicitacao['solicitacao_status'] == 'D':
+                # Se está com o tipo "D", então é uma S.S. que foi distribuída e tem que ser gerada uma O.S. para ela.
+                print("##### verificar_status_ss - S.S. com Status 'D' encontrada: ", solicitacao)
+
+                # Aqui, vou precisar ver as O.S. que estão abertas para essa S.S.
+                # O método retorna uma lista de objetos que podem ser serializados para JSON.
+                ordens_ss_atual, query_ordens_ss_str = OrdemServicoService.get_ordens_por_solicitacao(
+                    solicitacao['solicitacao_id'],
+                    solicitacao['solicitacao_filial']
+                )
+
+                print("Ordens da S.S. sendo Iterada Serializadas:", json.dumps(ordens_ss_atual, indent=4))
+
+                # Cada iteração é um `OrderedDict`, dentro de um `OrderedDict.collection.`
+                # Ref: https://docs.python.org/3/library/collections.html#ordereddict-objects
+                for ordem_ss in ordens_ss_atual:
+                    print("\n##### Informações de Inicio e Fim de Atendimento #####\n")
+                    print("Data e Hora de Inicio: ", ordem_ss['ordem_data_inicio_atendimento'], ordem_ss['ordem_hora_inicio_atendimento'])
+                    print("Data e Hora de Fim: ", ordem_ss['ordem_data_fim_atendimento'], ordem_ss['ordem_hora_fim_atendimento'])
+                    print(f"\n{'-' * 50}\n")
+                    if (
+                            ordem_ss['ordem_data_inicio_atendimento'].strip() != "" and
+                            ordem_ss['ordem_hora_inicio_atendimento'].strip() != "" and
+                            ordem_ss['ordem_data_fim_atendimento'].strip() == "" and
+                            ordem_ss['ordem_hora_fim_atendimento'].strip() == ""
+                    ):
+                        # Se a O.S. está aberta com uma data inicial de atendimento, então a S.S. está em "Em Serviço".
+                        solicitacao['solicitacao_status'] = "S"
+                        print("##### verificar_status_ss - S.S. com Status 'S' encontrada: ", solicitacao)

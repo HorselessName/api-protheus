@@ -6,6 +6,21 @@ from sqlalchemy.orm import aliased
 
 
 class ExecutorService:
+
+    @staticmethod
+    def validar_executor(executor):
+        """
+        Valida se o Executor recebido é válido.
+        Para ser válido:
+
+        1. Deve conter o código do usuário vinculado ao executor.
+        """
+
+        if executor.get('executor_usuario'):
+            return True
+        else:
+            return False
+
     @staticmethod
     def especialidade_para_dict(especialidade_do_executor):
         """

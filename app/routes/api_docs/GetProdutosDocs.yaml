@@ -1,0 +1,65 @@
+Trás a lista de produtos do tipo informado.
+---
+tags:
+  - Produtos
+parameters:
+  - name: tipos_de_produto
+    in: query
+    type: string
+    required: true
+    description: Tipos de Produto a Serem Listados
+  - name: pagina
+    in: query
+    type: integer
+    required: false
+    default: 1
+    description: Número da página atual para a paginação dos resultados.
+  - name: itens_por_pagina
+    in: query
+    type: integer
+    required: false
+    default: 500
+    description: Quantidade de itens por página.
+responses:
+  200:
+    description: Lista de Produtos
+    schema:
+      id: Produtos
+    properties:
+      produtos:
+        type: array
+        items:
+          type: object
+          properties:
+            codigo:
+              type: string
+              description: Código do Produto
+            descricao: # Corrigido a indentação aqui
+              type: string
+              description: Descrição do Produto
+  400:
+    description: Erro na Requisição
+
+definitions:
+  Produtos:
+    type: object
+    properties:
+      produtos:
+        type: array
+        items:
+          $ref: '#/definitions/Produto'
+  Produto:
+    type: object
+    properties:
+      codigo:
+        type: string
+        description: Código do Produto
+      descricao:
+        type: string
+        description: Descrição do Produto
+      unidade:
+        type: string
+        description: Unidade do Produto
+      tipo:
+        type: string
+        description: Tipo do Produto

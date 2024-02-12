@@ -8,6 +8,11 @@ parameters:
     type: string
     required: true
     description: Código da Solicitação de Serviço (TJ_SOLICI)
+  - name: ordem_filial
+    in: query
+    type: string
+    required: true
+    description: Código da Filial da O.S. / S.S. (TJ_FILIAL)
 responses:
   200:
     description: Uma lista de Ordens de Serviço vinculadas a S.S. Informada.
