@@ -6,7 +6,7 @@ services:
     volumes:
       - vol_api_protheus:/app
     ports:
-      - "${API_HOST}:${API_PORT}:5000"
+      - "127.0.0.1:${API_HOST}:${API_PORT}:5000"
     restart: always
 
 volumes:
