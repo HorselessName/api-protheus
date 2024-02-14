@@ -3,7 +3,7 @@
 from sqlalchemy.exc import OperationalError
 from sqlalchemy import or_, func, case, and_
 from models import Equipamento, Solicitacao
-from .utils import validar_numeros, validar_caracteres
+from .Utils import validar_numeros, validar_caracteres
 from schemas import EquipamentoSchema
 
 # TODO: Organizar por Ordem Alfabética.

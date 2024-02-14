@@ -16,3 +16,6 @@ def initialize_routes(app):
 
     from routes.ProdutoRoute import blueprint_produtos
     app.register_blueprint(blueprint_produtos)
+
+    from routes.UtilsRoute import blueprint_utils
+    app.register_blueprint(blueprint_utils)

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.OrdemServicoService import OrdemServicoService
-from services.utils import validar_caracteres, validar_numeros
+from services.Utils import validar_caracteres, validar_numeros
 from flasgger import swag_from
 
 """

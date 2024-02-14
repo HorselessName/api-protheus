@@ -62,6 +62,7 @@ Se todas estiverem instaladas, e seu Pipfile.lock estiver configurado, você rod
 - Para o Driver do SQL funcinar, instale o UnixODBC: `apt install -y unixodbc`
 - Python DOT Env para variaveis de ambiente: `pipenv install python-dotenv`
 - Flask CORS para permitir acesso externo: `pipenv install flask-cors`
+- Pytz para lidar com horários e fusos horários: `pipenv install pytz`
 
 Após instalar os pacotes, você precisa configurar o seu arquivo .env com suas informações de acessos do seu Banco de Dados SQL Server.
 - Rodar o Aplicativo: `pipenv run python main.py`

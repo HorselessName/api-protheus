@@ -17,7 +17,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import aliased
 
 # Importar modulos de validacao
-from services.utils import *
+from services.Utils import *
 
 
 class SetorLogic:

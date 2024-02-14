@@ -4,7 +4,7 @@ import json
 from flask import jsonify
 
 from models import Solicitacao
-from services.utils import valores_por_virgula, verificar_asterisco
+from services.Utils import valores_por_virgula, verificar_asterisco
 from services.OrdemServicoService import OrdemServicoService
 from typing import List, Union, Dict
 from schemas import SolicitacaoSchema

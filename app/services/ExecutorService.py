@@ -1,7 +1,7 @@
 import json
 
 from models import EspecialidadesDoExecutor, Executor, DetalhesEspecialidade
-from services.utils import verificar_asterisco
+from services.Utils import verificar_asterisco
 from sqlalchemy.orm import aliased
 
 

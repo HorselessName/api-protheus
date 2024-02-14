@@ -5,22 +5,23 @@ from sqlalchemy import MetaData
 
 # URL Lib para conexão com o SQL Server usando nosso .env.
 import urllib.parse
-from dotenv import dotenv_values
+import os
 
 # Tratativas de Erros e Logs do SQLAlchemy.
 from sqlalchemy.exc import OperationalError, InvalidRequestError
 import logging
 
-config = dotenv_values(".env")
-
 # Configuracoes do SQL Server - Timeout aqui é para tentativa de conexão inicial.
 config_mssql = urllib.parse.quote_plus(
     "DRIVER={ODBC Driver 17 for SQL Server};"
-    "SERVER=" + config['SQL_SERVER_HOST'] + ";"
-    "DATABASE=" + config['SQL_SERVER_DATABASE'] + ";"
-    "UID=" + config['SQL_SERVER_USER'] + ";"
-    "PWD=" + config['SQL_SERVER_PASSWORD'] + ";"
-    "timeout=3;")
+    "SERVER=" + os.getenv('SQL_SERVER_HOST') + ";"
+    "DATABASE=" + os.getenv('SQL_SERVER_DATABASE') + ";"
+    "UID=" + os.getenv('SQL_SERVER_USER') + ";"
+    "PWD=" + os.getenv('SQL_SERVER_PASSWORD') + ";"
+    "timeout=3;"
+)
+
+print("config_mssql: ", config_mssql)
 
 DATABASE_URI = 'mssql+pyodbc:///?odbc_connect={}'.format(config_mssql)
 

@@ -2,7 +2,7 @@
 
 from sqlalchemy.exc import OperationalError
 from models import Solicitacao
-from .utils import validar_numeros, validar_caracteres, format_sql_query
+from .Utils import validar_numeros, validar_caracteres, format_sql_query
 from .SolicitacaoService import SolicitacaoService
 from schemas import SolicitacaoSchema
 from sqlalchemy import or_

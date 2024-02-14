@@ -151,3 +151,14 @@ def dois_caracteres_uppercase(lista_valores):
         if not (valor.isupper() and len(valor) == 2):
             return False
     return True
+
+
+def horario_atual():
+    from datetime import datetime
+    import pytz
+
+    fuso_horario = pytz.timezone('America/Sao_Paulo')
+    agora = datetime.now(fuso_horario)
+    data_formatada = agora.strftime('%Y%m%d %H:%M')
+
+    return data_formatada

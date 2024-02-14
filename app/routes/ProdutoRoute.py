@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flasgger import swag_from
-from services import utils
+from services import Utils
 from services.ProdutoService import ProdutoService
 
 blueprint_produtos = Blueprint('produtos', __name__)
@@ -10,14 +10,14 @@ blueprint_produtos = Blueprint('produtos', __name__)
 @swag_from('./api_docs/GetProdutosDocs.yaml')
 def get_produtos():
     try:
-        tipos_de_produto = utils.valores_por_virgula(request.args.get('tipos_de_produto'))
+        tipos_de_produto = Utils.valores_por_virgula(request.args.get('tipos_de_produto'))
 
         # Verificar se é um único tipo de produto sem vírgula
         if tipos_de_produto is None:
             tipos_de_produto = [request.args.get('tipos_de_produto')]
-            if not utils.dois_caracteres_uppercase(tipos_de_produto):
+            if not Utils.dois_caracteres_uppercase(tipos_de_produto):
                 return jsonify({"erro": "Tipo de produto inválido"}), 400
-        elif not utils.dois_caracteres_uppercase(tipos_de_produto):
+        elif not Utils.dois_caracteres_uppercase(tipos_de_produto):
             return jsonify({"erro": "Tipos de produto inválidos"}), 400
 
         # Obter parâmetros de paginação da query string

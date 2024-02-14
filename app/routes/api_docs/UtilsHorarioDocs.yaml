@@ -1,0 +1,18 @@
+tags:
+  - Utils
+summary: Retorna o horário atual do servidor com fuso horário ajustado para São Paulo.
+description: Retorna o horário atual do servidor que está a API, com fuso horário ajustado para São Paulo/America.
+operationId: getHorarioAtual
+responses:
+  200:
+    description: Retorna o horário do servidor com fuso horário ajustado.
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            horario:
+              type: string
+              example: '20240214 16:12'
+  500:
+    description: Erro interno do servidor.

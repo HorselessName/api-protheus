@@ -3,7 +3,7 @@ import re
 from flask import Blueprint, jsonify, request
 from services.ManutencaoService import ManutencaoService  # Ajuste conforme sua estrutura de imports
 from services.SolicitacaoService import SolicitacaoService
-from services.utils import validar_status, validar_data_between, validar_caracteres
+from services.Utils import validar_status, validar_data_between, validar_caracteres
 
 from flasgger import swag_from
 

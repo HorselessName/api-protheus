@@ -6,7 +6,7 @@ services:
     volumes:
       - vol_api_protheus:/app
     ports:
-      # Host:Container - Escrever na mão pq o .env não é carregado nesse momento.
+      # Escrever na mão pq o .env não é carregado no momento que o Docker Compose passa no `ports`.
       - "192.168.17.24:9000:9000"
     restart: always
     # Flask requires SIGINT to stop gracefully

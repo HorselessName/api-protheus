@@ -4,7 +4,7 @@ from sqlalchemy.dialects import mssql
 from db_context import db_sql
 from models import OrdemServico, OrdemServicoInsumo
 from schemas import OrdemServicoSchema, OrdemServicoInsumoSchema
-from services.utils import format_sql_query
+from services.Utils import format_sql_query
 from datetime import datetime
 
 # Todo: Verificar se o Funcionário está cadastrado na Filial.
