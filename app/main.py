@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, redirect
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
@@ -25,4 +27,6 @@ def documentacao():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    host = '0.0.0.0'
+    port = 9000
+    app.run(host=host, port=port, debug=True)

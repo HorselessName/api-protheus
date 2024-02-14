@@ -48,12 +48,16 @@ RUN pipenv install --system --deploy --ignore-pipfile
 RUN adduser --disabled-password --gecos "" --uid 10000 api_protheus
 RUN chown -R api_protheus:api_protheus /app
 
-# Muda para o usuário não-root
-USER api_protheus
+# Copie o script de entrada e torne-o executável
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Comando a Ser Executado quando o Container Inicia como Não-Root
-ENTRYPOINT ["python"]
-CMD ["main.py"]
+# Muda para o usuário não-root e seta para ele o WORKDIR.
+USER api_protheus
+WORKDIR /app
+
+# Use o script de entrada como ponto de entrada
+ENTRYPOINT ["entrypoint.sh"]
 
 # Para Testes:
 # ENTRYPOINT ["tail", "-f", "/dev/null"]
