@@ -1,0 +1,50 @@
+Lista Informações sobre o Usuário, incluindo suas permissões.
+---
+tags:
+  - Informações do Usuário
+parameters:
+  - name: usuario_login
+    in: path
+    type: string
+    required: true
+    description: Login do Usuário a ser consultado (USR_CODIGO)
+    maxLength: 25
+produces:
+  - application/json
+responses:
+  200:
+    description: Informações do Usuário
+    schema:
+    $ref: '#/definitions/Usuario'
+  404:
+    description: Usuário não encontrado
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Usuário não encontrado
+  500:
+    description: Erro interno
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Erro interno
+definitions:
+  Usuario:
+    type: object
+    properties:
+      usuario_codigo:
+        type: string
+        description: Código do Usuário
+      usuario_login:
+        type: string
+        description: Login do Usuário
+      usuario_nome:
+        type: string
+        description: Nome do Usuário
+      usuario_bloqueado:
+        type: string
+        description: Usuário Bloqueado

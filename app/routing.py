@@ -19,3 +19,6 @@ def initialize_routes(app):
 
     from routes.UtilsRoute import blueprint_utils
     app.register_blueprint(blueprint_utils)
+
+    from routes.UsuarioRoute import blueprint_usuarios
+    app.register_blueprint(blueprint_usuarios)
