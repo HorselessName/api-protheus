@@ -31,7 +31,9 @@ Após cumprir os Pré-Requisitos, dentro do projeto que contém o Dockerfile, en
 # Instalação Manual
 
 ## Dependencies / Installation
-Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`.
+
+- Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`.
+- Instalar [driver do SQL Server](https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16#version-17), ODBC Driver Manager.
 
 ## Instaladas Globalmente
 - Instalar o Virtual Env: `pip install --upgrade virtualenv`
@@ -43,6 +45,7 @@ Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`.
     - Linux: `export PIPENV_VENV_IN_PROJECT=1`
     - Windows - CMD: `set PIPENV_VENV_IN_PROJECT=1`
     - Windows - PowerShell: `$env:PIPENV_VENV_IN_PROJECT=1`
+    - Para Persistir, no PowerShell: `setx PIPENV_VENV_IN_PROJECT 1`
   - Instalar o VENV com o PIPENV: `pipenv install`
 
 ## Instalada no Virtual Environment
