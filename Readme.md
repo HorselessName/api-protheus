@@ -43,6 +43,7 @@ Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`.
     - Linux: `export PIPENV_VENV_IN_PROJECT=1`
     - Windows - CMD: `set PIPENV_VENV_IN_PROJECT=1`
     - Windows - PowerShell: `$env:PIPENV_VENV_IN_PROJECT=1`
+    - Para Persistir, no PowerShell: `setx PIPENV_VENV_IN_PROJECT 1`
   - Instalar o VENV com o PIPENV: `pipenv install`
 
 ## Instalada no Virtual Environment
