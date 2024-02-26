@@ -37,6 +37,9 @@ Atualizar o PIP, primeiramente: `python -m pip install --upgrade pip`.
 - Instalar o Virtual Env: `pip install --upgrade virtualenv`
 - Instalar o SetupTools: `pip install --upgrade setuptools`
 - Gerenciador de pacotes: `pip install pipenv`
+- Para o Driver do SQL funcinar, instale o UnixODBC: `apt install -y unixodbc`
+- Siga [tutorial p/ instalar no Linux](https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16&tabs=alpine18-install%2Calpine17-install%2Cdebian8-install%2Credhat7-13-install%2Crhel7-offline#17) o SQL Driver 17.
+
 
 - Instalar o VENV com o PIPENV:
   - Configurar para fazer o VENV Local.
@@ -59,7 +62,6 @@ Se todas estiverem instaladas, e seu Pipfile.lock estiver configurado, você rod
 - Flask Marshmallow: `pipenv install flask-marshmallow`
 - Flasgger for Swagger: `pipenv install flasgger`
 - PyODBC Driver do SQL Server: `pipenv install pyodbc`
-- Para o Driver do SQL funcinar, instale o UnixODBC: `apt install -y unixodbc`
 - Python DOT Env para variaveis de ambiente: `pipenv install python-dotenv`
 - Flask CORS para permitir acesso externo: `pipenv install flask-cors`
 - Pytz para lidar com horários e fusos horários: `pipenv install pytz`
