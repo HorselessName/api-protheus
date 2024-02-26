@@ -20,7 +20,7 @@ class BaseSchema(SQLAlchemyAutoSchema):
         return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
     @pre_load
-    def process_dataclass(self, data, **kwargs):
+    def process_dataclass(self, data):
         if self.Meta.model and isinstance(data, self.Meta.model):
             if hasattr(data, 'to_dict'):
                 data = data.to_dict()
@@ -29,7 +29,7 @@ class BaseSchema(SQLAlchemyAutoSchema):
         return data
 
     @post_load
-    def trim_strings(self, data, **kwargs):
+    def trim_strings(self, data):
         for key, value in data.items():
             if isinstance(value, str):
                 data[key] = value.strip()

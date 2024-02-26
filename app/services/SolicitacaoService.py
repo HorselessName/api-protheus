@@ -80,11 +80,7 @@ class SolicitacaoService:
         pass
 
     @staticmethod
-    def get_solicitacoes(solicitacao_filial: str,
-                         solicitacao_status: str,
-                         solicitacao_tipo: str,
-                         solicitacao_equipamento: str,
-                         data_between: str):
+    def get_solicitacoes():
         # Trago todas as solicitações, sem filtro.
         # 1. Crio a Query apenas.
         todas_solicitacoes = Solicitacao.query.filter(Solicitacao.D_E_L_E_T_ != '*')
@@ -100,40 +96,58 @@ class SolicitacaoService:
     def verificar_status_ss(solicitacoes: List[SolicitacaoType]):
         """
         Verifica os status de cada S.S. e atualiza o status no objeto sendo iterado, caso necessário.
-        TODO: Please, GitHub Copilot, fix the error "name 'SolicitacaoSchema' is not defined"
 
         :param solicitacoes: Lista de Solicitações.
         """
         print("\n----> Service Solicitações: Verificando Status das S.S. <----")
 
-        # Para cada S.S., vou precisar ver se o status dela é "D" primeiro de tudo. Se não for "D", nem faço nada.
         for solicitacao in solicitacoes:
             if solicitacao['solicitacao_status'] == 'D':
-                # Se está com o tipo "D", então é uma S.S. que foi distribuída e tem que ser gerada uma O.S. para ela.
-                print("##### verificar_status_ss - S.S. com Status 'D' encontrada: ", solicitacao)
+                SolicitacaoService.validar_se_ss_distribuida(solicitacao)
 
-                # Aqui, vou precisar ver as O.S. que estão abertas para essa S.S.
-                # O método retorna uma lista de objetos que podem ser serializados para JSON.
-                ordens_ss_atual, query_ordens_ss_str = OrdemServicoService.get_ordens_por_solicitacao(
-                    solicitacao['solicitacao_id'],
-                    solicitacao['solicitacao_filial']
-                )
+    @staticmethod
+    def validar_se_ss_distribuida(solicitacao: SolicitacaoType):
+        """
+        Valida se uma S.S. com status "D" (Distribuída) realmente possui uma O.S. aberta para ela
+        e se essa O.S. possui um executor.
 
-                print("Ordens da S.S. sendo Iterada Serializadas:", json.dumps(ordens_ss_atual, indent=4))
+        :param solicitacao: Uma instância da Solicitação de Serviço.
+        """
+        print("##### Validar se S.S. Distribuída - S.S. com Status 'D' encontrada: ", solicitacao)
 
-                # Cada iteração é um `OrderedDict`, dentro de um `OrderedDict.collection.`
-                # Ref: https://docs.python.org/3/library/collections.html#ordereddict-objects
-                for ordem_ss in ordens_ss_atual:
-                    print("\n##### Informações de Inicio e Fim de Atendimento #####\n")
-                    print("Data e Hora de Inicio: ", ordem_ss['ordem_data_inicio_atendimento'], ordem_ss['ordem_hora_inicio_atendimento'])
-                    print("Data e Hora de Fim: ", ordem_ss['ordem_data_fim_atendimento'], ordem_ss['ordem_hora_fim_atendimento'])
-                    print(f"\n{'-' * 50}\n")
-                    if (
-                            ordem_ss['ordem_data_inicio_atendimento'].strip() != "" and
-                            ordem_ss['ordem_hora_inicio_atendimento'].strip() != "" and
-                            ordem_ss['ordem_data_fim_atendimento'].strip() == "" and
-                            ordem_ss['ordem_hora_fim_atendimento'].strip() == ""
-                    ):
-                        # Se a O.S. está aberta com uma data inicial de atendimento, então a S.S. está em "Em Serviço".
-                        solicitacao['solicitacao_status'] = "S"
-                        print("##### verificar_status_ss - S.S. com Status 'S' encontrada: ", solicitacao)
+        ordens_ss_atual, query_ordens_ss_str = OrdemServicoService.get_ordens_por_solicitacao(
+            solicitacao['solicitacao_id'],
+            solicitacao['solicitacao_filial']
+        )
+
+        print("Ordens da S.S. sendo Iterada Serializadas:", json.dumps(ordens_ss_atual, indent=4))
+
+        # TODO: Verificar se tem O.S. aberta. Se não tiver, a gente atualiza o status da S.S. para "A".
+
+        for ordem_ss in ordens_ss_atual:
+            SolicitacaoService.ver_se_ss_em_servico(ordem_ss, solicitacao)
+
+    @staticmethod
+    def ver_se_ss_em_servico(ordem_ss: dict, solicitacao: SolicitacaoType):
+        """
+        Verifica se a Ordem de Serviço indica que a Solicitação de Serviço está em serviço,
+        atualizando o status da S.S. para "S" se aplicável.
+
+        :param ordem_ss: A Ordem de Serviço sendo verificada.
+        :param solicitacao: A Solicitação de Serviço a ser potencialmente atualizada.
+        """
+        print("\n##### Informações de Inicio e Fim de Atendimento #####\n")
+        print("Data e Hora de Inicio: ", ordem_ss['ordem_data_inicio_atendimento'],
+              ordem_ss['ordem_hora_inicio_atendimento'])
+        print("Data e Hora de Fim: ", ordem_ss['ordem_data_fim_atendimento'],
+              ordem_ss['ordem_hora_fim_atendimento'])
+
+        if (
+                ordem_ss['ordem_data_inicio_atendimento'].strip() != "" and
+                ordem_ss['ordem_hora_inicio_atendimento'].strip() != "" and
+                ordem_ss['ordem_data_fim_atendimento'].strip() == "" and
+                ordem_ss['ordem_hora_fim_atendimento'].strip() == ""
+        ):
+            # Se a O.S. está aberta com uma data inicial de atendimento, então a S.S. está em "Em Serviço".
+            solicitacao['solicitacao_status'] = "S"
+            print("##### S.S. atualizada para Status 'S': ", solicitacao)

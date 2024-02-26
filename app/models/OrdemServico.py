@@ -118,7 +118,8 @@ class OrdemServicoInsumo(db_sql.Model):
     insumo_sequencia_tarefa: Mapped[str] = mapped_column("TL_SEQTARE", db_sql.VARCHAR)
     insumo_codigo_aen: Mapped[str] = mapped_column("TL_CODAEN", db_sql.VARCHAR)
 
-    insumo_codigo: Mapped[str] = mapped_column('TL_CODIGO', db_sql.VARCHAR, ForeignKey(Executor.executor_matricula), primary_key=True)
+    insumo_codigo: Mapped[str] = mapped_column('TL_CODIGO', db_sql.VARCHAR,
+                                               ForeignKey(Executor.executor_matricula), primary_key=True)
 
     insumo_tipo: Mapped[str] = mapped_column('TL_TIPOREG', db_sql.VARCHAR)
     insumo_filial: Mapped[str] = mapped_column('TL_FILIAL', db_sql.VARCHAR)

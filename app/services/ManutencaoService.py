@@ -37,10 +37,10 @@ class ManutencaoService:
         try:
             status_list = status.split(',')
 
-            print("##### Manutencao Service - S.S. Status Check: ", filial, status_list)
+            print("##### Manutencao Service - S.S. Status Check: ", filial, status)
 
             solicitacoes = Solicitacao.query.filter(
-                Solicitacao.solicitacao_filial == filial,
+                Solicitacao.solicitacao_filial.in_(filial.split(',') if ',' in filial else [filial]),
                 Solicitacao.solicitacao_status.in_(status_list),
                 Solicitacao.D_E_L_E_T_ != '*'
             )
@@ -49,7 +49,7 @@ class ManutencaoService:
             solicitacao_schema = SolicitacaoSchema(many=True)
             solicitacoes_json = solicitacao_schema.dump(solicitacoes.all())
 
-            # RENEG-01: Verificar o `status` da SS.
+            # TODO: GDM-116 - Verificar o `status` da SS e ajustar se realmente é `D` de Distribuido.
             SolicitacaoService.verificar_status_ss(solicitacoes_json)
 
             return query_str, solicitacoes_json, None
@@ -65,7 +65,8 @@ class ManutencaoService:
 
         :param filial: ID da filial.
         :param equipamento: ID do equipamento.
-        :return: Uma lista das solicitações, mensagem de erro (se houver) e um booleano indicando se há solicitações abertas.
+        :return: Uma lista das solicitações, mensagem de erro (se houver) e
+        um booleano indicando se há solicitações abertas.
         """
         is_valid, message = validar_numeros(filial)
         if not is_valid:

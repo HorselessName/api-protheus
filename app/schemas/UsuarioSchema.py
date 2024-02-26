@@ -8,10 +8,12 @@ class UsuarioFilialSchema(SQLAlchemyAutoSchema):
         model = UsuarioFilial
         load_instance = True
 
-    # Especificar campos personalizados.
+        # Certifique-se de que exclude é uma lista de nomes de campos a serem excluídos
+        exclude = ('usuario_acesso',)  # Nota: isso é uma tupla, mas você também pode usar uma lista ['usuario_acesso']
+
+    # Campos personalizados mantidos
     usuario_filial = auto_field()
     usuario_filial_grupo = auto_field()
-    usuario_acesso = auto_field()
 
 
 class UsuarioSchema(SQLAlchemyAutoSchema):

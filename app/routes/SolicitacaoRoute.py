@@ -44,8 +44,6 @@ def get_solicitacao():
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
 
-# Rota pra trazer todas as solicitações de uma filial
-# Lista todas as solicitações de uma filial com base no status fornecido.
 @blueprint_manutencao.route('/manutencao/solicitacao/filial', methods=['GET'])
 @swag_from('./api_docs/SolicitacoesFilialDocs.yaml')
 def get_solicitacoes_filial():
@@ -55,12 +53,13 @@ def get_solicitacoes_filial():
     if not validar_status(status):
         return jsonify({'erro': 'Formato de status inválido'}), 400
 
-    print("Request Recebido para Ver se tem S.S. aberta para. Args: ", filial, status)
+    print("##### SolicitacaoRoute: Request Recebido para Ver se tem S.S. aberta para. Args: ", filial, status)
 
     if not filial or not status:
         return jsonify({'error': 'Os campos "filial" e "status" são obrigatórios.'}), 400
 
     try:
+
         # Precisa vir a quantia certa de argumentos, senão ele gera o erro "Not Enough Values to Unpack"
         sql, solicitacoes, mensagem_erro = ManutencaoService.buscar_solicitacoes_filial(
             filial=filial,
@@ -76,7 +75,7 @@ def get_solicitacoes_filial():
         return jsonify(response_data)
 
     except Exception as e:
-        print(f"Erro ao processar as solicitações da Filial: {e}")
+        print(f"##### SolicitacaoRoute: Erro ao processar as solicitações da Filial: {e}")
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
 

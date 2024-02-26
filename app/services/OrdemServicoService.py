@@ -29,7 +29,7 @@ class OrdemServicoService:
             # Diferente do `Dumps`, que faz o `dump` e depois o `loads`, ou seja, que já retorna um JSON pronto.
 
             print("-" * 30)
-            print(f"Ordens de Serviço serializadas: {ordens_servico_json}")
+            print(f"##### GET Ordens por S.S.: Ordens de Serviço serializadas: {ordens_servico_json}")
 
             return ordens_servico_json, query_ordens_servico_str
 
