@@ -47,35 +47,40 @@ def get_solicitacao():
 @blueprint_manutencao.route('/manutencao/solicitacao/filial', methods=['GET'])
 @swag_from('./api_docs/SolicitacoesFilialDocs.yaml')
 def get_solicitacoes_filial():
+    print("##### Iniciando get_solicitacoes_filial")
+
     filial = request.args.get('filial')
+    print(f"##### Filial recebida: {filial}")
+
     status = request.args.get('status')
+    print(f"##### Status recebido: {status}")
 
     if not validar_status(status):
+        print("##### Status inválido")
         return jsonify({'erro': 'Formato de status inválido'}), 400
 
-    print("##### SolicitacaoRoute: Request Recebido para Ver se tem S.S. aberta para. Args: ", filial, status)
+    print("##### Status validado com sucesso")
 
     if not filial or not status:
+        print("##### Campos 'filial' ou 'status' não fornecidos")
         return jsonify({'error': 'Os campos "filial" e "status" são obrigatórios.'}), 400
 
     try:
-
-        # Precisa vir a quantia certa de argumentos, senão ele gera o erro "Not Enough Values to Unpack"
-        sql, solicitacoes, mensagem_erro = ManutencaoService.buscar_solicitacoes_filial(
-            filial=filial,
-            status=status)
+        print("##### Tentando buscar solicitações")
+        sql, solicitacoes, mensagem_erro = ManutencaoService.buscar_solicitacoes_filial(filial=filial, status=status)
 
         if mensagem_erro:
+            print(f"##### Mensagem de erro: {mensagem_erro}")
             response_data = {'mensagem': mensagem_erro}
         else:
             response_data = {'sql': sql, 'solicitacoes': solicitacoes}
 
-        print("Lista de Solicitacoes: ", response_data)
+        print(f"##### Lista de Solicitações: {response_data}")
 
         return jsonify(response_data)
 
     except Exception as e:
-        print(f"##### SolicitacaoRoute: Erro ao processar as solicitações da Filial: {e}")
+        print(f"##### Erro ao processar as solicitações da Filial: {e}")
         return jsonify({'error': 'Erro interno do servidor'}), 500
 
 
