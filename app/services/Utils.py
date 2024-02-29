@@ -5,21 +5,52 @@ import re
 from datetime import datetime
 
 
+def validar_filial(filial: str) -> (bool, str):
+    """
+    Valida se a filial ou filiais fornecidas estão no formato correto.
+    - Filiais devem ser strings de 6 dígitos, podendo ser várias separadas por vírgula.
+    """
+    # Divide a string de filial pelas vírgulas, criando uma lista de filiais.
+    filiais = filial.split(',')
+
+    # Loop para validar cada filial na lista
+    for f in filiais:
+        # Reutiliza o método validar_numeros para cada filial
+        valido, mensagem = validar_numeros(f)
+        if not valido:
+            return False, mensagem
+
+    # Se todas as filiais passaram na validação
+    return True, ""
+
+
 def validar_numeros(numeros: str) -> (bool, str):
     """
-    O método verifica se o valor contém apenas números e se o tamanho é igual a 6.
+    Verifica se o valor contém apenas números de 6 dígitos. Pode ser um único número ou múltiplos números separados por vírgula.
     """
-    if len(numeros) != 6:
-        return False, "O código deve ter exatamente 6 dígitos."
+    print("##### Validando Números: ", numeros)
 
-    if not bool(re.match("^[0-9]+$", numeros)):
-        if any(char.isalpha() for char in numeros):  # Verifica se contém letras
-            return False, "O código deve conter apenas números, e você informou letras."
-        if ' ' in numeros:  # Verifica se contém espaços
-            return False, "O código deve conter apenas números, mas você está enviando espaços."
-        return False, "O código deve conter apenas números."
+    # Primeiro, verifica se há múltiplos valores separados por vírgula
+    valores = valores_por_virgula(numeros) or [numeros]
+
+    for valor in valores:
+        # Verifica se cada valor tem exatamente 6 dígitos e contém apenas números
+        if len(valor) != 6 or not bool(re.match("^[0-9]+$", valor)):
+            if any(char.isalpha() for char in valor):  # Verifica se contém letras
+                return False, "Cada código deve conter apenas números, e você informou letras."
+            if ' ' in valor:  # Verifica se contém espaços
+                return False, "Cada código deve conter apenas números, mas você está enviando espaços."
+            return False, "Cada código deve ter exatamente 6 dígitos e conter apenas números."
 
     return True, ""
+
+
+def valores_por_virgula(valor: str) -> list:
+    """
+    Verifica se o valor contém vários valores separados por vírgula.
+    Retorna uma lista dos valores separados.
+    """
+    return valor.split(",") if "," in valor else [valor]
 
 
 def validar_caracteres(texto: str, nome_campo: str = None) -> (bool, str):
@@ -72,8 +103,8 @@ def validar_status(status: str) -> bool:
                    without spaces, containing only the characters 'A', 'E', 'C', and 'D'. Each character can only appear
                    once in the status string.
 
-    :return: A boolean value indicating whether the status is valid. Returns True if the status is valid (i.e., it follows
-             the required pattern and only contains safe characters). Returns False otherwise.
+    :return: A boolean value indicating whether the status is valid. Returns True if the status is valid (i.e.,
+    it follows the required pattern and only contains safe characters). Returns False otherwise.
 
     Usage:
     >>> validar_status('A,B,C')
@@ -124,22 +155,11 @@ def validar_data_between(data: str) -> bool | tuple[bool, str]:
     pass
 
 
-# == Verificação de Dados Recebidos ==
 def verificar_asterisco(valor):
     """
     Verifica se o valor é um asterisco, indicando que todos os valores devem ser considerados.
     """
     return re.match(r"^[*]?$", valor)
-
-
-def valores_por_virgula(valor):
-    """
-    Verifica se o valor contém vários valores separados por vírgula.
-    Retorna uma lista dos valores separados ou None se não houver vírgula.
-    """
-    if "," in valor:
-        return valor.split(",")
-    return None
 
 
 def dois_caracteres_uppercase(lista_valores):

@@ -21,7 +21,7 @@ config_mssql = urllib.parse.quote_plus(
     "timeout=3;"
 )
 
-print("config_mssql: ", config_mssql)
+print("`db_context.py` - Configurando o MSSQL - `config_mssql`: ", config_mssql)
 
 DATABASE_URI = 'mssql+pyodbc:///?odbc_connect={}'.format(config_mssql)
 

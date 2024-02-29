@@ -46,7 +46,7 @@ class ExecutorService:
         return especialidades_do_executor
 
     @staticmethod
-    def get_executor(executante_codigo):
+    def get_executor_por_matricula(executante_codigo):
         """
         Retorna uma lista de dicionários representando os executores.
         """
@@ -78,7 +78,7 @@ class ExecutorService:
             return None
 
     @staticmethod
-    def get_executores(especialidade_nome):
+    def get_executores_por_especialidade(especialidade_nome):
         """
         Retorna uma lista de dicionários representando os executores.
         Neste método é possível trazer TODOS os Executores, passando `*` como parâmetro.

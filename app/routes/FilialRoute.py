@@ -22,7 +22,8 @@ def fazer_testes():
 @blueprint_filial.route('/filial/setores', methods=['GET'])
 def get_setores():
     """
-    Retorna a lista dos setores para os grupos e filiais informados, com a possibilidade de aplicar filtros condicionais e padrões.
+    Retorna a lista dos setores para os grupos e filiais informados, com a possibilidade de aplicar filtros
+    condicionais e padrões.
     ---
     tags:
       - Setores
