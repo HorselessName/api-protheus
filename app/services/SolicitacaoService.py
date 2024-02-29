@@ -1,15 +1,13 @@
 # == Solicitação Service ==
 import json
 
-from flask import jsonify
-
 from models import Solicitacao
 from services.Utils import valores_por_virgula, verificar_asterisco
 from services.OrdemServicoService import OrdemServicoService
 from typing import List, Union, Dict
 from schemas import SolicitacaoSchema
 
-SolicitacaoType = Union[Dict, SolicitacaoSchema]
+SolicitacaoType = Union[Dict, SolicitacaoSchema, Solicitacao]
 
 
 class SolicitacaoService:
@@ -94,38 +92,47 @@ class SolicitacaoService:
 
     @staticmethod
     def verificar_status_ss(solicitacoes: List[SolicitacaoType]):
-        """
-        Verifica os status de cada S.S. e atualiza o status no objeto sendo iterado, caso necessário.
-
-        :param solicitacoes: Lista de Solicitações.
-        """
-        print("\n----> Service Solicitações: Verificando Status das S.S. <----")
-
+        print("\n----> Service Solicitações: Verificando Status das S.S. recebidas <----")
         for solicitacao in solicitacoes:
             if solicitacao['solicitacao_status'] == 'D':
                 SolicitacaoService.validar_se_ss_distribuida(solicitacao)
 
     @staticmethod
     def validar_se_ss_distribuida(solicitacao: SolicitacaoType):
-        """
-        Valida se uma S.S. com status "D" (Distribuída) realmente possui uma O.S. aberta para ela
-        e se essa O.S. possui um executor.
+        ordens_ss_atual, query_ordens_ss_str = (OrdemServicoService
+                                                .get_ordens_por_solicitacao
+                                                (solicitacao['solicitacao_id'], solicitacao['solicitacao_filial']))
 
-        :param solicitacao: Uma instância da Solicitação de Serviço.
-        """
-        print("##### Validar se S.S. Distribuída - S.S. com Status 'D' encontrada: ", solicitacao)
+        if len(ordens_ss_atual) == 0:
+            print("##### Não tem O.S. para a S.S.: ", solicitacao['solicitacao_id'])
+            solicitacao['solicitacao_status'] = "A"
+            return
 
-        ordens_ss_atual, query_ordens_ss_str = OrdemServicoService.get_ordens_por_solicitacao(
-            solicitacao['solicitacao_id'],
-            solicitacao['solicitacao_filial']
-        )
+        print("##### Tem O.S. na S.S.: ", solicitacao['solicitacao_id'], "; Verificando se possuem Executores...")
+        if not SolicitacaoService.checar_se_ordem_tem_executores(ordens_ss_atual):
+            print("##### Atualizando status da S.S. para 'A' devido à falta de executor em uma ou mais O.S.")
+            solicitacao['solicitacao_status'] = "A"
+            return  # Saio do método, pois a S.S. não está conforme esperado.
 
-        print("Ordens da S.S. sendo Iterada Serializadas:", json.dumps(ordens_ss_atual, indent=4))
-
-        # TODO: Verificar se tem O.S. aberta. Se não tiver, a gente atualiza o status da S.S. para "A".
-
+        print("##### Todas as O.S. possuem Executores; Verificando se a S.S. está em Serviço...")
         for ordem_ss in ordens_ss_atual:
             SolicitacaoService.ver_se_ss_em_servico(ordem_ss, solicitacao)
+
+    @staticmethod
+    def checar_se_ordem_tem_executores(ordens_ss_atual):
+        for ordem in ordens_ss_atual:
+            tem_executor = False
+            for insumo in ordem['ordem_insumos']:
+                detalhes_insumo = insumo['detalhes_insumo']
+                if detalhes_insumo['insumo_tipo'] == 'M' and detalhes_insumo['executor_nome'].strip():
+                    tem_executor = True
+                    break  # Se encontrar um executor, não precisa verificar os outros insumos
+
+            if not tem_executor:
+                print("##### O.S. sem executor: ", ordem['ordem_id'])
+                return False  # Retorna False assim que encontra uma O.S. sem executor
+
+        return True  # Retorna True se todas as O.S. têm executor
 
     @staticmethod
     def ver_se_ss_em_servico(ordem_ss: dict, solicitacao: SolicitacaoType):
@@ -136,11 +143,6 @@ class SolicitacaoService:
         :param ordem_ss: A Ordem de Serviço sendo verificada.
         :param solicitacao: A Solicitação de Serviço a ser potencialmente atualizada.
         """
-        print("\n##### Informações de Inicio e Fim de Atendimento #####\n")
-        print("Data e Hora de Inicio: ", ordem_ss['ordem_data_inicio_atendimento'],
-              ordem_ss['ordem_hora_inicio_atendimento'])
-        print("Data e Hora de Fim: ", ordem_ss['ordem_data_fim_atendimento'],
-              ordem_ss['ordem_hora_fim_atendimento'])
 
         if (
                 ordem_ss['ordem_data_inicio_atendimento'].strip() != "" and

@@ -1,4 +1,5 @@
 # == Manutenção Service ==
+import json
 
 from sqlalchemy.exc import OperationalError
 from models import Solicitacao
@@ -20,7 +21,7 @@ class ManutencaoService:
 
         Valores Possíveis:
         - A - Em Análise,
-        - D - Distribuido, -- Neste status, é gerado uma O.S. ao distribuir.
+        - TODO: D - Distribuido, (Só está D se tem OS aberta e um EXECUTOR foi atribuído.)
         - TODO: S - Em Serviço (Gerar pela Regra de Negócio),
         - TODO: V - Em Validação (Gerar pela Regra de Negócio, depois da S. Fazer primeiro apenas S.),
         - E - Encerrada,

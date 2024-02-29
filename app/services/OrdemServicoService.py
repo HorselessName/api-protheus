@@ -19,17 +19,11 @@ class OrdemServicoService:
                 OrdemServico.ordem_filial == ordem_filial
             )
             query_ordens_servico_str = format_sql_query(query_ordens_servico)
-
-            print(f"\n----> Query Ordem de Serviço: <----\n{query_ordens_servico}\n{'-' * 50}\n")
-
             ordens_servico_schema = OrdemServicoSchema(many=True)
             ordens_servico_json = ordens_servico_schema.dump(query_ordens_servico.all())
 
             # PS: O `Dump` do Marshmallow só faz o `dump`, ou seja, permite os dados serem serializados para JSON.
             # Diferente do `Dumps`, que faz o `dump` e depois o `loads`, ou seja, que já retorna um JSON pronto.
-
-            print("-" * 30)
-            print(f"##### GET Ordens por S.S.: Ordens de Serviço serializadas: {ordens_servico_json}")
 
             return ordens_servico_json, query_ordens_servico_str
 
@@ -43,7 +37,7 @@ class OrdemServicoService:
         """
         return OrdemServico.query.filter(
             OrdemServico.ordem_excluida == '',
-            OrdemServico.ordem_hora_inicio_manutencao != "00:00",
+            OrdemServico.ordem_hora_previsto_inicio_manutencao != "00:00",
             OrdemServico.ordem_codsolicitacao != "",
             OrdemServico.ordem_situacao == "L",
             OrdemServico.ordem_id == ordem_id,

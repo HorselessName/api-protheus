@@ -54,7 +54,18 @@ class OrdemServico(db_sql.Model):
 
     @hybrid_property
     def ordem_prioridade(self):
-        return self.solicitacao_vinculada.solicitacao_prioridade if self.solicitacao_vinculada else None
+        prioridade = self.solicitacao_vinculada.solicitacao_prioridade if self.solicitacao_vinculada else None
+        if prioridade in ["", " ", None] or prioridade not in ["1", "2", "3"]:
+            return "1"
+        return prioridade
+
+    def to_dict(self):
+        return {
+            "ordem_id": self.ordem_id,
+            "ordem_filial": self.ordem_filial,
+            "ordem_prioridade": self.ordem_prioridade if self.ordem_prioridade in ["1", "2", "3"] else "1",
+            # Inclua outras propriedades conforme necessário
+        }
 
     solicitacao_vinculada = relationship(
         "Solicitacao",
