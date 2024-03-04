@@ -101,33 +101,15 @@ class OrdemServicoInsumo(db_sql.Model):
     # REF: https://docs.sqlalchemy.org/en/20/core/type_basics.html#sql-standard-and-multiple-vendor-uppercase-types
 
     insumo_ordem_id: Mapped[str] = mapped_column('TL_ORDEM', db_sql.VARCHAR, ForeignKey(OrdemServico.ordem_id))
-    insumo_tarefa: Mapped[str] = mapped_column("TL_TAREFA", db_sql.VARCHAR)
-    insumo_usa_calendario: Mapped[str] = mapped_column("TL_USACALE", db_sql.VARCHAR)
 
-    insumo_quantidade_recomendada: Mapped[float] = mapped_column("TL_QUANREC", db_sql.Float)
     insumo_quantidade: Mapped[float] = mapped_column("TL_QUANTID", db_sql.Float)
 
     insumo_unidade: Mapped[str] = mapped_column("TL_UNIDADE", db_sql.VARCHAR)
-    insumo_destino: Mapped[str] = mapped_column("TL_DESTINO", db_sql.VARCHAR)
 
     insumo_data_inicio: Mapped[str] = mapped_column("TL_DTINICI", db_sql.VARCHAR)
     insumo_hora_inicio: Mapped[str] = mapped_column("TL_HOINICI", db_sql.VARCHAR)
-
-    insumo_almoxarifado: Mapped[str] = mapped_column("TL_LOCAL", db_sql.VARCHAR)
-    insumo_local_aplicacao: Mapped[str] = mapped_column("TL_LOCAPLI", db_sql.VARCHAR)
-    insumo_numero_sc: Mapped[str] = mapped_column("TL_NUMSC", db_sql.VARCHAR)
-    insumo_item_sc: Mapped[str] = mapped_column("TL_ITEMSC", db_sql.VARCHAR)
-
-    insumo_observacoes: Mapped[str] = mapped_column("TL_OBSERVA", db_sql.VARBINARY, nullable=True)
-
-    insumo_nota_fiscal: Mapped[str] = mapped_column("TL_NOTFIS", db_sql.VARCHAR)
-    insumo_serie: Mapped[str] = mapped_column("TL_SERIE", db_sql.VARCHAR)
-    insumo_fornecedor: Mapped[str] = mapped_column("TL_FORNEC", db_sql.VARCHAR)
-    insumo_loja: Mapped[str] = mapped_column("TL_LOJA", db_sql.VARCHAR)
-    insumo_numero_sa: Mapped[str] = mapped_column("TL_NUMSA", db_sql.VARCHAR)
-    insumo_item_sa: Mapped[str] = mapped_column("TL_ITEMSA", db_sql.VARCHAR)
-    insumo_sequencia_tarefa: Mapped[str] = mapped_column("TL_SEQTARE", db_sql.VARCHAR)
-    insumo_codigo_aen: Mapped[str] = mapped_column("TL_CODAEN", db_sql.VARCHAR)
+    insumo_data_fim: Mapped[str] = mapped_column("TL_DTFIM", db_sql.VARCHAR)
+    insumo_hora_fim: Mapped[str] = mapped_column("TL_HOFIM", db_sql.VARCHAR)
 
     insumo_codigo: Mapped[str] = mapped_column('TL_CODIGO', db_sql.VARCHAR,
                                                ForeignKey(Executor.executor_matricula), primary_key=True)
@@ -155,3 +137,29 @@ class OrdemServicoInsumo(db_sql.Model):
         primaryjoin="Executor.executor_matricula==OrdemServicoInsumo.insumo_codigo",
         lazy="joined"
     )
+
+    # GDM-111 - Ajuste de Propriedades para Insumos aparecerem no Protheus
+    insumo_plano_manutencao: Mapped[str] = mapped_column("TL_PLANO", db_sql.VARCHAR, default='000000')
+    insumo_sequencia_retorno: Mapped[str] = mapped_column("TL_SEQRELA", db_sql.VARCHAR, default='0')
+    insumo_tarefa: Mapped[str] = mapped_column("TL_TAREFA", db_sql.VARCHAR, default='0')
+    insumo_quantidade_recomendada: Mapped[float] = mapped_column("TL_QUANREC", db_sql.Float, default=0.0)
+    insumo_usa_calendario: Mapped[str] = mapped_column("TL_USACALE", db_sql.VARCHAR , default='N')
+    insumo_destino: Mapped[str] = mapped_column("TL_DESTINO", db_sql.VARCHAR, default='S')
+    insumo_almoxarifado: Mapped[str] = mapped_column("TL_LOCAL", db_sql.VARCHAR, default='40')
+    insumo_local_aplicacao: Mapped[str] = mapped_column("TL_LOCAPLI", db_sql.VARCHAR, default='')
+    insumo_numero_sc: Mapped[str] = mapped_column("TL_NUMSC", db_sql.VARCHAR, default='')
+    insumo_item_sc: Mapped[str] = mapped_column("TL_ITEMSC", db_sql.VARCHAR, default='')
+    insumo_observacoes: Mapped[str] = mapped_column("TL_OBSERVA", db_sql.VARBINARY, nullable=True, default=None)
+    insumo_nota_fiscal: Mapped[str] = mapped_column("TL_NOTFIS", db_sql.VARCHAR, default='')
+    insumo_serie: Mapped[str] = mapped_column("TL_SERIE", db_sql.VARCHAR, default='')
+    insumo_fornecedor: Mapped[str] = mapped_column("TL_FORNEC", db_sql.VARCHAR, default='')
+    insumo_loja: Mapped[str] = mapped_column("TL_LOJA", db_sql.VARCHAR, default='')
+
+    # Importante: A Sol. Armazém é gerada ao apontar insumo na O.S. na MATA105. Fica na tabela "SCP010"
+    insumo_numero_sa: Mapped[str] = mapped_column("TL_NUMSA", db_sql.VARCHAR, default='')
+    insumo_item_sa: Mapped[str] = mapped_column("TL_ITEMSA", db_sql.VARCHAR, default='')
+
+    # A Sequência da Tarefa precisa ser `auto increment`, ou seja, pegar a última sequência e incrementar 1.
+    insumo_sequencia_tarefa: Mapped[str] = mapped_column("TL_SEQTARE", db_sql.VARCHAR, default='')
+
+    insumo_codigo_aen: Mapped[str] = mapped_column("TL_CODAEN", db_sql.VARCHAR, default='')

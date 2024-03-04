@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 
 class ProdutoService:
     @staticmethod
-    def trazer_produtos(tipos, pagina=1, itens_por_pagina=500):
+    def trazer_produtos(tipos, pagina=1, itens_por_pagina=5000):
         try:
             print("#" * 50)
             print("# Iniciando a busca de produtos com paginação")

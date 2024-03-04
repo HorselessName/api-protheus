@@ -22,7 +22,7 @@ def get_produtos():
 
         # Obter parâmetros de paginação da query string
         pagina = int(request.args.get('pagina', 1))
-        itens_por_pagina = int(request.args.get('itens_por_pagina', 500))
+        itens_por_pagina = int(request.args.get('itens_por_pagina', 5000))
 
         # Buscar os produtos com paginação
         produtos = ProdutoService.trazer_produtos(tipos_de_produto, pagina, itens_por_pagina)
