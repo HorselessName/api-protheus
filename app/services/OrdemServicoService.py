@@ -5,7 +5,7 @@ from db_context import db_sql
 from models import OrdemServico, OrdemServicoInsumo
 from schemas import OrdemServicoSchema, OrdemServicoInsumoSchema
 from services.Utils import format_sql_query
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Todo: Verificar se o Funcionário está cadastrado na Filial.
 
@@ -167,25 +167,12 @@ class OrdemServicoService:
 
                 # Campos Adicionais Necessários
                 # Ref: https://tdn.totvs.com/pages/releaseview.action?pageId=543079696
-                insumo_tarefa="1",
-                insumo_usa_calendario="N",
-                insumo_quantidade_recomendada="2",
-                insumo_destino="S",
                 insumo_data_inicio=datetime.now().strftime('%Y%m%d'),
                 insumo_hora_inicio=datetime.now().strftime('%H:%M'),
-                insumo_almoxarifado="40",
-                insumo_local_aplicacao="",
-                insumo_numero_sc="",
-                insumo_item_sc="",
-                insumo_observacoes=None,
-                insumo_nota_fiscal="",
-                insumo_serie="",
-                insumo_fornecedor="",
-                insumo_loja="",
-                insumo_numero_sa="014840",
-                insumo_item_sa="01",
-                insumo_sequencia_tarefa="002",
-                insumo_codigo_aen="",
+
+                # Incremento uma hora na hora/data acima com o `timedelta`
+                insumo_data_fim=(datetime.now() + timedelta(hours=1)).strftime('%Y%m%d'),
+                insumo_hora_fim=(datetime.now() + timedelta(hours=1)).strftime('%H:%M'),
             )
 
             # Gera uma lista de `OrderedDict`s com os insumos já existentes na O.S. Pega o primeiro, que é os insumos.
@@ -224,25 +211,12 @@ class OrdemServicoService:
 
                 # Campos Adicionais Necessários
                 # Ref: https://tdn.totvs.com/pages/releaseview.action?pageId=543079696
-                insumo_tarefa="1",
-                insumo_usa_calendario="N",
-                insumo_quantidade_recomendada="2",
-                insumo_destino="S",
                 insumo_data_inicio=datetime.now().strftime('%Y%m%d'),
                 insumo_hora_inicio=datetime.now().strftime('%H:%M'),
-                insumo_almoxarifado="40",
-                insumo_local_aplicacao="",
-                insumo_numero_sc="",
-                insumo_item_sc="",
-                insumo_observacoes=None,
-                insumo_nota_fiscal="",
-                insumo_serie="",
-                insumo_fornecedor="",
-                insumo_loja="",
-                insumo_numero_sa="014840",
-                insumo_item_sa="01",
-                insumo_sequencia_tarefa="002",
-                insumo_codigo_aen="",
+
+                # Incremento uma hora na hora/data acima com o `timedelta`
+                insumo_data_fim=(datetime.now() + timedelta(hours=1)).strftime('%Y%m%d'),
+                insumo_hora_fim=(datetime.now() + timedelta(hours=1)).strftime('%H:%M'),
             )
 
             compiled_query = insert_statement.compile(dialect=mssql.dialect(), compile_kwargs={"literal_binds": True})
