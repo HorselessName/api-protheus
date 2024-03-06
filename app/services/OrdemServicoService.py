@@ -46,16 +46,6 @@ class OrdemServicoService:
 
     @staticmethod
     def get_todas_ordens_servico():
-        """
-        Retorna todas as Ordens de Serviço.
-        Filtros p/ garantir que as O.S estão abertas:
-
-        - Não esteja deletado.
-        - Campos de Abertura de Hora ao abrir não devem estar 00:00.
-        - O código da Solicitação não deve estar vazio.
-        - A Situação da O.S. deve estar "L".
-        """
-
         # 1. Query para trazer as O.S. com os filtros de O.S.
         todas_ordens_servico = OrdemServico.query.filter(
             OrdemServico.ordem_excluida != '*',
@@ -73,6 +63,12 @@ class OrdemServicoService:
         print("-" * 30)
         print("Get Todas O.s. - Ordens de Serviço Formatadas:")
         print(todas_ordens_servico_json, "\n\n", format_sql_query(todas_ordens_servico))
+
+        # 4. Ver a Descrição atual da O.S. no log, extraida e decodificada do campo `ordem_observacao`.
+        for ordem in todas_ordens_servico:
+            print("##### Ordem - S.S. ID:", ordem.ordem_codsolicitacao)
+            print("##### Ordem - O.S. Descrição Tipo: ", type(ordem.ordem_observacao_binario))
+            print("##### Ordem - O.S. Descrição:", ordem.ordem_observacao)
 
         return todas_ordens_servico_json, format_sql_query(todas_ordens_servico)
 

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 from db_context import db_sql
@@ -48,7 +48,6 @@ class OrdemServico(db_sql.Model):
 
     ordem_ultima_alteracao: Mapped[str] = mapped_column('TJ_USUARIO', db_sql.String)
     ordem_codsetor: Mapped[str] = mapped_column('TJ_CENTRAB', db_sql.String)
-    ordem_observacao: Mapped[str] = mapped_column('TJ_OBSERVA', db_sql.String)
     ordem_codsolicitacao: Mapped[str] = mapped_column('TJ_SOLICI', db_sql.String)
     ordem_situacao: Mapped[str] = mapped_column('TJ_SITUACA', db_sql.String)
 
@@ -91,6 +90,31 @@ class OrdemServico(db_sql.Model):
     @hybrid_property
     def ordem_equipamento_nome(self):
         return self.equipamento_da_ordem.equipamento_nome if self.equipamento_da_ordem else None
+
+    # O `db_sql.VARBINARY` informa o `DATA_TYPE` do campo no banco de dados, e o `Mapped` do SQLAlchemy faz a conversão.
+    ordem_observacao_binario: Mapped[bytes] = db_sql.Column('TJ_OBSERVA', db_sql.VARBINARY, nullable=True, default=None)
+
+    @property
+    def ordem_observacao(self):
+        """
+        Retorna a observação da O.S. em texto.
+
+        Verificar Collation: On SQL Server you can right click on a DB from the Object Explorer in SSMS
+        (SQL Server Management Studio) and Under the General Tab you see the Collation under Maintenance subgroup.
+
+        Collations: Latin1_General_BIN
+
+        """
+        if self.ordem_observacao_binario is not None:
+            try:
+                texto_observacao = self.ordem_observacao_binario.decode('latin1')
+                texto_observacao = texto_observacao.replace('\x00', '')
+                return texto_observacao
+            except UnicodeDecodeError as e:
+                print(f"Erro ao decodificar _ordem_observacao_bin: {e}")
+                return None
+        else:
+            return None
 
 
 @dataclass
