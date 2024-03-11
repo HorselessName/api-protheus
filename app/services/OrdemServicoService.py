@@ -2,13 +2,12 @@ from sqlalchemy import func
 from sqlalchemy.dialects import mssql
 
 from db_context import db_sql
-from models import OrdemServico, OrdemServicoInsumo
-from schemas import OrdemServicoSchema, OrdemServicoInsumoSchema
+from models import OrdemServico, OrdemServicoInsumo, OrdemServicoComentario
+from schemas import OrdemServicoSchema, OrdemServicoInsumoSchema, OrdemServicoComentarioSchema
 from services.Utils import format_sql_query
 from datetime import datetime, timedelta
 
-# Todo: Verificar se o Funcionário está cadastrado na Filial.
-
+import json
 
 class OrdemServicoService:
     @staticmethod
@@ -62,15 +61,122 @@ class OrdemServicoService:
         # 3. Retorno dos dados em JSON.
         print("-" * 30)
         print("Get Todas O.s. - Ordens de Serviço Formatadas:")
-        print(todas_ordens_servico_json, "\n\n", format_sql_query(todas_ordens_servico))
+        print(todas_ordens_servico_json, "\n\n", format_sql_query(todas_ordens_servico), '\n\n')
 
-        # 4. Ver a Descrição atual da O.S. no log, extraida e decodificada do campo `ordem_observacao`.
-        for ordem in todas_ordens_servico:
-            print("##### Ordem - S.S. ID:", ordem.ordem_codsolicitacao)
-            print("##### Ordem - O.S. Descrição Tipo: ", type(ordem.ordem_observacao_binario))
-            print("##### Ordem - O.S. Descrição:", ordem.ordem_observacao)
+        # Para testes: Chama o metodo `adicionar_comentarios_na_observacao` para adicionar comentarios na observação
+        # Atualiza o campo de Observação com a STRING informada.
+        # OrdemServicoService.adicionar_comentarios_na_observacao()
+        # OrdemServicoService.get_json_da_observacao_os()
+        OrdemServicoService.get_comentarios_da_os()
+
+        # 4. Agora passamos os dicionários JSON para o método pegar_observacao_os
+        for ordem_json in todas_ordens_servico_json:
+            OrdemServicoService.pegar_observacao_os_no_loop(ordem_json)
 
         return todas_ordens_servico_json, format_sql_query(todas_ordens_servico)
+
+    @staticmethod
+    def pegar_observacao_os_no_loop(ordem_json):
+        print("##### Ordem - S.S. ID:", ordem_json['ordem_codsolicitacao'])
+        observacao = ordem_json.get('ordem_observacao', None)
+
+        if observacao:
+            try:
+                dados_json = json.loads(observacao)
+                print("##### Ordem - O.S. Observação JSON:", dados_json)
+            except json.JSONDecodeError as erro_ao_pegar_observacao:
+                print(f"Erro ao decodificar JSON da observação na O.S. ID {ordem_json.get('ordem_codsolicitacao')}: "
+                      f"{erro_ao_pegar_observacao}")
+        else:
+            print("##### Ordem - O.S. Observação: Vazio ou None")
+
+    @staticmethod
+    def adicionar_comentarios_na_observacao(ordem_id='014179'):
+        """
+        Adiciona comentários na Observação da O.S. com o ID informado.
+        """
+        ordem_servico = OrdemServico.query.filter_by(ordem_id=ordem_id).first()
+        if ordem_servico:
+            print(f"Encontrei a O.S. {ordem_id} que vou adicionar comentários na observação.")
+            # Verifica se a observação atual é um JSON válido
+            observacao_atual_json = OrdemServicoService.get_json_da_observacao_os(ordem_id)
+            if observacao_atual_json is not None:
+                try:
+                    novo_comentario = json.dumps({"mensagem": "Alteração pelo APP"})
+
+                    # Converte a STRING JSON para VARBINARY (Processo Inverso do que foi feito na Model)
+                    ordem_servico.ordem_observacao_binario = novo_comentario.encode('latin1')
+                    db_sql.session.commit()
+                    print(f"Comentários adicionados com sucesso na O.S. {ordem_id}.")
+
+                except Exception as e:
+                    db_sql.session.rollback()
+                    print(f"Erro ao adicionar comentários na observação da O.S. {ordem_id}: {e}")
+            else:
+                print(f"A observação atual da O.S. {ordem_id} não está em formato JSON válido. Atualização cancelada.")
+        else:
+            print(f"Não encontrei a O.S. {ordem_id} para adicionar comentários na observação.")
+
+    @staticmethod
+    def get_json_da_observacao_os(ordem_id='014179'):
+        ordem_servico = OrdemServico.query.filter_by(ordem_id=ordem_id).first()
+        if ordem_servico and ordem_servico.ordem_observacao_binario:
+            observacao_texto = ordem_servico.ordem_observacao
+            try:
+                print(f"Verificando formato JSON da observação da O.S. {ordem_id}: {observacao_texto}")
+                dados_json = json.loads(observacao_texto)
+                print(f"Observação da O.S. {ordem_id} é um JSON válido: {dados_json}")
+                return dados_json
+            except json.JSONDecodeError:
+                print(f"A observação da O.S. {ordem_id} não está em um formato JSON válido. Impossível desserializar.")
+                return None
+        else:
+            print(f"Ordem de serviço {ordem_id} não encontrada ou sem observação.")
+            return None
+
+    @staticmethod
+    def get_comentarios_da_os(ordem_id='014179', ordem_filial='020101'):
+        """
+        Faz um SELECT nos Comentários da O.S., serializa pra JSON com o Marshmallow.
+        """
+        comentarios = OrdemServicoComentario.query.filter_by(
+            comentario_os_ordem=ordem_id,
+            comentario_os_filial=ordem_filial
+        ).all()
+
+        if comentarios:
+            schema = OrdemServicoComentarioSchema(many=True)
+            comentarios_serializados = schema.dump(comentarios)
+
+            print(f"Comentários encontrados para a O.S. {ordem_id}:")
+            for comentario in comentarios_serializados:
+                print(comentario)
+
+            return comentarios_serializados
+        else:
+            print(f"Nenhum comentário encontrado para a O.S. {ordem_id}.")
+            return []
+
+    @staticmethod
+    def adicionar_comentario_na_os(ordem_id, filial, texto_comentario, comentario_os_seq=None, recno=None):
+
+        try:
+            novo_comentario = OrdemServicoComentario(
+                comentario_os_filial=filial,
+                comentario_os_seq=comentario_os_seq,
+                comentario_os_ordem=ordem_id,
+                comentario_os_texto=texto_comentario,
+                # TODO: Fix the date and time fields giving "Expected type 'Mapped[str]', got 'str' instead " error.
+                comentario_os_data=datetime.now().strftime('%Y%m%d'),
+                comentario_os_hora=datetime.now().strftime('%H:%M'),
+                R_E_C_N_O_=recno
+            )
+            db_sql.session.add(novo_comentario)
+            db_sql.session.commit()
+            print(f"Comentário adicionado com sucesso na O.S. {ordem_id}.")
+        except Exception as e:
+            db_sql.session.rollback()
+            print(f"Erro ao adicionar comentário na O.S. {ordem_id}: {e}")
 
     @staticmethod
     def get_ordem_servico(ordem_id: str, ordem_filial: str):

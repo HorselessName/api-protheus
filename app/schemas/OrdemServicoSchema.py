@@ -73,3 +73,14 @@ class OrdemServicoSchema(SQLAlchemyAutoSchema):
         include_fk = True
         exclude = ("ordem_excluida", "ordem_observacao_binario",)
         ordered = True
+
+
+class OrdemServicoComentarioSchema(SQLAlchemyAutoSchema):
+    """
+    Schema do Marshmallow para Desserialização dos Comentários da Ordem de Serviço.
+    """
+
+    class Meta:
+        model = OrdemServico
+        load_instance = True
+        ordered = True

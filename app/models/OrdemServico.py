@@ -167,7 +167,7 @@ class OrdemServicoInsumo(db_sql.Model):
     insumo_sequencia_retorno: Mapped[str] = mapped_column("TL_SEQRELA", db_sql.VARCHAR, default='0')
     insumo_tarefa: Mapped[str] = mapped_column("TL_TAREFA", db_sql.VARCHAR, default='0')
     insumo_quantidade_recomendada: Mapped[float] = mapped_column("TL_QUANREC", db_sql.Float, default=0.0)
-    insumo_usa_calendario: Mapped[str] = mapped_column("TL_USACALE", db_sql.VARCHAR , default='N')
+    insumo_usa_calendario: Mapped[str] = mapped_column("TL_USACALE", db_sql.VARCHAR, default='N')
     insumo_destino: Mapped[str] = mapped_column("TL_DESTINO", db_sql.VARCHAR, default='S')
     insumo_almoxarifado: Mapped[str] = mapped_column("TL_LOCAL", db_sql.VARCHAR, default='40')
     insumo_local_aplicacao: Mapped[str] = mapped_column("TL_LOCAPLI", db_sql.VARCHAR, default='')
@@ -187,3 +187,16 @@ class OrdemServicoInsumo(db_sql.Model):
     insumo_sequencia_tarefa: Mapped[str] = mapped_column("TL_SEQTARE", db_sql.VARCHAR, default='')
 
     insumo_codigo_aen: Mapped[str] = mapped_column("TL_CODAEN", db_sql.VARCHAR, default='')
+
+
+@dataclass
+class OrdemServicoComentario(db_sql.Model):
+    __tablename__ = 'SZC010'
+
+    comentario_os_filial: Mapped[str] = mapped_column('ZC_FILIAL', db_sql.VARCHAR, primary_key=True)
+    comentario_os_seq: Mapped[str] = mapped_column('ZC_SEQ', db_sql.VARCHAR, primary_key=True)
+    comentario_os_ordem: Mapped[str] = mapped_column('ZC_ORDEM', db_sql.VARCHAR, primary_key=True)
+    comentario_os_texto: Mapped[str] = mapped_column('ZC_TXT', db_sql.VARCHAR)
+    comentario_os_data: Mapped[str] = mapped_column('ZC_DATA', db_sql.VARCHAR)
+    comentario_os_hora: Mapped[str] = mapped_column('ZC_HORA', db_sql.VARCHAR)
+    R_E_C_N_O_: Mapped[str] = mapped_column('R_E_C_N_O_', db_sql.BIGINT)
