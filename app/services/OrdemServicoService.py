@@ -161,12 +161,13 @@ class OrdemServicoService:
     def adicionar_comentario_na_os(ordem_id, filial, texto_comentario, comentario_os_seq=None, recno=None):
 
         try:
+            # noinspection PyTypeChecker
             novo_comentario = OrdemServicoComentario(
                 comentario_os_filial=filial,
                 comentario_os_seq=comentario_os_seq,
                 comentario_os_ordem=ordem_id,
                 comentario_os_texto=texto_comentario,
-                # TODO: Fix the date and time fields giving "Expected type 'Mapped[str]', got 'str' instead " error.
+
                 comentario_os_data=datetime.now().strftime('%Y%m%d'),
                 comentario_os_hora=datetime.now().strftime('%H:%M'),
                 R_E_C_N_O_=recno

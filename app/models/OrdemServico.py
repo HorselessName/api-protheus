@@ -127,7 +127,6 @@ class OrdemServicoInsumo(db_sql.Model):
     insumo_ordem_id: Mapped[str] = mapped_column('TL_ORDEM', db_sql.VARCHAR, ForeignKey(OrdemServico.ordem_id))
 
     insumo_quantidade: Mapped[float] = mapped_column("TL_QUANTID", db_sql.Float)
-
     insumo_unidade: Mapped[str] = mapped_column("TL_UNIDADE", db_sql.VARCHAR)
 
     insumo_data_inicio: Mapped[str] = mapped_column("TL_DTINICI", db_sql.VARCHAR)
@@ -197,6 +196,8 @@ class OrdemServicoComentario(db_sql.Model):
     comentario_os_seq: Mapped[str] = mapped_column('ZC_SEQ', db_sql.VARCHAR, primary_key=True)
     comentario_os_ordem: Mapped[str] = mapped_column('ZC_ORDEM', db_sql.VARCHAR, primary_key=True)
     comentario_os_texto: Mapped[str] = mapped_column('ZC_TXT', db_sql.VARCHAR)
+
     comentario_os_data: Mapped[str] = mapped_column('ZC_DATA', db_sql.VARCHAR)
     comentario_os_hora: Mapped[str] = mapped_column('ZC_HORA', db_sql.VARCHAR)
+
     R_E_C_N_O_: Mapped[str] = mapped_column('R_E_C_N_O_', db_sql.BIGINT)
