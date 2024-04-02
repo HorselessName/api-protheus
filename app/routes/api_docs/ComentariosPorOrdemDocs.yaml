@@ -1,0 +1,51 @@
+Lista os Comentários da Ordem informada
+---
+tags:
+  - Ordens de Serviço
+parameters:
+  - name: ordem_filial
+    in: query
+    type: string
+    required: true
+    description: Filial em que a S.S. está aberta.
+    default: '020101'
+  - in: path
+    name: ordem_id
+    type: string
+    required: true
+    description: Identificação da ID que vai ser listado os Comentários.
+responses:
+  200:
+    description: Lista de Comentários da O.S.
+    schema:
+      id: Comentarios
+      properties:
+        comentario_os_seq:
+          type: integer
+          description: ID do Comentário da O.S. (Filial + OS)
+        comentario_os_filial:
+          type: string
+          description: Filial do Comentário da O.S.
+        comentario_os_ordem:
+          type: string
+          description: ID da Ordem de Serviço
+        comentario_os_texto:
+          type: string
+          description: Texto do Comentário da O.S.
+        comentario_os_data:
+          type: string
+          description: Data que o Comentário foi Adicionado
+        comentario_os_hora:
+          type: string
+          description: Hora que o Comentário foi Adicionado
+        R_E_C_N_O_:
+          type: integer
+          description: ID do Comentário da O.S. (Global)
+  400:
+    description: Requisição inválida (parâmetros faltando)
+    schema:
+      id: Error
+      properties:
+        error:
+          type: string
+          description: Mensagem de erro

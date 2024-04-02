@@ -2,12 +2,13 @@ from sqlalchemy import func
 from sqlalchemy.dialects import mssql
 
 from db_context import db_sql
-from models import OrdemServico, OrdemServicoInsumo, OrdemServicoComentario
-from schemas import OrdemServicoSchema, OrdemServicoInsumoSchema, OrdemServicoComentarioSchema
+from models import OrdemServico, OrdemServicoInsumo, OrdemServicoComentario, ProdutoSaldo
+from schemas import OrdemServicoSchema, OrdemServicoInsumoSchema, OrdemServicoComentarioSchema, ProdutoSaldoSchema
 from services.Utils import format_sql_query
 from datetime import datetime, timedelta
 
 import json
+
 
 class OrdemServicoService:
     @staticmethod
@@ -63,12 +64,6 @@ class OrdemServicoService:
         print("Get Todas O.s. - Ordens de Serviço Formatadas:")
         print(todas_ordens_servico_json, "\n\n", format_sql_query(todas_ordens_servico), '\n\n')
 
-        # Para testes: Chama o metodo `adicionar_comentarios_na_observacao` para adicionar comentarios na observação
-        # Atualiza o campo de Observação com a STRING informada.
-        # OrdemServicoService.adicionar_comentarios_na_observacao()
-        # OrdemServicoService.get_json_da_observacao_os()
-        OrdemServicoService.get_comentarios_da_os()
-
         # 4. Agora passamos os dicionários JSON para o método pegar_observacao_os
         for ordem_json in todas_ordens_servico_json:
             OrdemServicoService.pegar_observacao_os_no_loop(ordem_json)
@@ -91,7 +86,7 @@ class OrdemServicoService:
             print("##### Ordem - O.S. Observação: Vazio ou None")
 
     @staticmethod
-    def adicionar_comentarios_na_observacao(ordem_id='014179'):
+    def adicionar_comentarios_na_observacao(ordem_id):
         """
         Adiciona comentários na Observação da O.S. com o ID informado.
         """
@@ -118,7 +113,7 @@ class OrdemServicoService:
             print(f"Não encontrei a O.S. {ordem_id} para adicionar comentários na observação.")
 
     @staticmethod
-    def get_json_da_observacao_os(ordem_id='014179'):
+    def get_json_da_observacao_os(ordem_id):
         ordem_servico = OrdemServico.query.filter_by(ordem_id=ordem_id).first()
         if ordem_servico and ordem_servico.ordem_observacao_binario:
             observacao_texto = ordem_servico.ordem_observacao
@@ -135,49 +130,75 @@ class OrdemServicoService:
             return None
 
     @staticmethod
-    def get_comentarios_da_os(ordem_id='014179', ordem_filial='020101'):
-        """
-        Faz um SELECT nos Comentários da O.S., serializa pra JSON com o Marshmallow.
-        """
+    def get_comentarios_da_os(ordem_id, ordem_filial):
+        # Lógica para buscar os comentários
         comentarios = OrdemServicoComentario.query.filter_by(
             comentario_os_ordem=ordem_id,
             comentario_os_filial=ordem_filial
         ).all()
 
+        # Supondo que você queira retornar a query SQL como string
+        query_str = str(OrdemServicoComentario.query.filter_by(
+            comentario_os_ordem=ordem_id,
+            comentario_os_filial=ordem_filial
+        ))
+
         if comentarios:
             schema = OrdemServicoComentarioSchema(many=True)
-            comentarios_serializados = schema.dump(comentarios)
-
-            print(f"Comentários encontrados para a O.S. {ordem_id}:")
-            for comentario in comentarios_serializados:
-                print(comentario)
-
-            return comentarios_serializados
+            comentarios_json = schema.dump(comentarios)
         else:
-            print(f"Nenhum comentário encontrado para a O.S. {ordem_id}.")
-            return []
+            comentarios_json = []
+
+        return comentarios_json, query_str
 
     @staticmethod
-    def adicionar_comentario_na_os(ordem_id, filial, texto_comentario, comentario_os_seq=None, recno=None):
+    def adicionar_comentario_na_os(ordem_id, filial, texto_comentario):
+        """
+        Adiciona um comentário na O.S., verifica o R_E_C_N_O_ de forma incremental, para não haver duplicidade.
+        """
 
         try:
+            # Encontra o maior valor de R_E_C_N_O_ e comentario_os_seq para adicionar o novo comentário corretamente
+            max_recno = OrdemServicoComentario.query.with_entities(func.max(OrdemServicoComentario.R_E_C_N_O_)).scalar()
+            recno = 1 if max_recno is None else max_recno + 1
+
+            max_comentario_os_seq = OrdemServicoComentario.query.filter_by(comentario_os_ordem=ordem_id,
+                                                                           comentario_os_filial=filial).with_entities(
+                func.max(OrdemServicoComentario.comentario_os_seq)).scalar()
+            comentario_os_seq = "001" if max_comentario_os_seq is None else f"{int(max_comentario_os_seq) + 1:03d}"
+
             # noinspection PyTypeChecker
             novo_comentario = OrdemServicoComentario(
                 comentario_os_filial=filial,
                 comentario_os_seq=comentario_os_seq,
                 comentario_os_ordem=ordem_id,
                 comentario_os_texto=texto_comentario,
-
                 comentario_os_data=datetime.now().strftime('%Y%m%d'),
                 comentario_os_hora=datetime.now().strftime('%H:%M'),
                 R_E_C_N_O_=recno
             )
+
             db_sql.session.add(novo_comentario)
             db_sql.session.commit()
-            print(f"Comentário adicionado com sucesso na O.S. {ordem_id}.")
+
+            # Monta a mensagem informativa sobre o comentário adicionado
+            comentario_json = {
+                "mensagem": f"Comentário '{texto_comentario}' foi adicionado na Ordem de ID {ordem_id}, na Filial {filial}, às {novo_comentario.comentario_os_hora} do dia {novo_comentario.comentario_os_data}.",
+                "comentario": {
+                    "comentario_os_data": novo_comentario.comentario_os_data,
+                    "comentario_os_hora": novo_comentario.comentario_os_hora,
+                    "comentario_os_filial": novo_comentario.comentario_os_filial,
+                    "comentario_os_ordem": novo_comentario.comentario_os_ordem,
+                    "comentario_os_seq": novo_comentario.comentario_os_seq,
+                    "comentario_os_texto": novo_comentario.comentario_os_texto,
+                }
+            }
+
+            return comentario_json
+
         except Exception as e:
             db_sql.session.rollback()
-            print(f"Erro ao adicionar comentário na O.S. {ordem_id}: {e}")
+            return f"Erro ao adicionar comentário na O.S. {ordem_id}: {e}"
 
     @staticmethod
     def get_ordem_servico(ordem_id: str, ordem_filial: str):
@@ -249,7 +270,6 @@ class OrdemServicoService:
 
         """
         try:
-
             # Obtendo o valor máximo atual da coluna R_E_C_N_O_
             max_rec_no = db_sql.session.query(func.max(OrdemServicoInsumo.R_E_C_N_O_)).scalar()
             if max_rec_no is None:
@@ -257,6 +277,15 @@ class OrdemServicoService:
 
             # Incrementando o valor máximo
             novo_rec_no = max_rec_no + 1
+
+            # Aqui, assumimos que o método get_valor_do_insumo retorna apenas o valor do custo médio ou None
+            custo_medio_info = (OrdemServicoService.get_valor_do_insumo(
+                ordem_filial,
+                insumo_dados["insumo_codigo"],
+                insumo_dados["insumo_armazem"])
+            )
+
+            custo_medio = custo_medio_info.get('saldo_produto_custo_medio') if custo_medio_info else 0.00
 
             # Criando uma nova instância de OrdemServicoInsumo
             novo_insumo = OrdemServicoInsumo(
@@ -276,6 +305,9 @@ class OrdemServicoService:
                 # Incremento uma hora na hora/data acima com o `timedelta`
                 insumo_data_fim=(datetime.now() + timedelta(hours=1)).strftime('%Y%m%d'),
                 insumo_hora_fim=(datetime.now() + timedelta(hours=1)).strftime('%H:%M'),
+
+                # Adicionando o custo médio do insumo
+                insumo_custo_medio=custo_medio
             )
 
             # Gera uma lista de `OrderedDict`s com os insumos já existentes na O.S. Pega o primeiro, que é os insumos.
@@ -320,6 +352,9 @@ class OrdemServicoService:
                 # Incremento uma hora na hora/data acima com o `timedelta`
                 insumo_data_fim=(datetime.now() + timedelta(hours=1)).strftime('%Y%m%d'),
                 insumo_hora_fim=(datetime.now() + timedelta(hours=1)).strftime('%H:%M'),
+
+                # Adicionando o custo médio do insumo
+                custo_medio=custo_medio
             )
 
             compiled_query = insert_statement.compile(dialect=mssql.dialect(), compile_kwargs={"literal_binds": True})
@@ -334,3 +369,21 @@ class OrdemServicoService:
             # Em caso de erro, desfazer a transação e retornar False.
             db_sql.session.rollback()
             return False, "Erro ao incluir o insumo na O.S."
+
+    @staticmethod
+    def get_valor_do_insumo(ordem_filial, insumo_codigo, insumo_armazem):
+        """
+        Retorna o valor do insumo solicitado ou None se o insumo não for encontrado.
+        """
+        custo_medio_insumo_query = ProdutoSaldo.query.filter(
+            ProdutoSaldo.saldo_produto_filial == ordem_filial,
+            ProdutoSaldo.saldo_produto_codigo == insumo_codigo,
+            ProdutoSaldo.saldo_produto_armazem == insumo_armazem
+        ).first()
+
+        if custo_medio_insumo_query:
+            produto_saldo_schema = ProdutoSaldoSchema(only=['saldo_produto_custo_medio'])
+            custo_medio_serializado = produto_saldo_schema.dump(custo_medio_insumo_query)
+            return custo_medio_serializado.get('saldo_produto_custo_medio')
+        else:
+            return None

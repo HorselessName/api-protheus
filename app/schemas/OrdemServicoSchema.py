@@ -1,4 +1,4 @@
-from models import OrdemServico, OrdemServicoInsumo
+from models import OrdemServico, OrdemServicoComentario
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow import fields
 from models import OrdemServicoInsumo
@@ -81,6 +81,6 @@ class OrdemServicoComentarioSchema(SQLAlchemyAutoSchema):
     """
 
     class Meta:
-        model = OrdemServico
+        model = OrdemServicoComentario
         load_instance = True
         ordered = True

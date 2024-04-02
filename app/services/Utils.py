@@ -30,12 +30,13 @@ def validar_numeros(numeros: str) -> (bool, str):
     """
     print("##### Validando Números: ", numeros)
 
-    # Primeiro, verifica se há múltiplos valores separados por vírgula
+    # Divide os valores por vírgula, se houver, ou trata como lista de um único valor
     valores = valores_por_virgula(numeros) or [numeros]
 
     for valor in valores:
+        valor = valor.strip()  # Remove espaços em branco extras
         # Verifica se cada valor tem exatamente 6 dígitos e contém apenas números
-        if len(valor) != 6 or not bool(re.match("^[0-9]+$", valor)):
+        if len(valor) != 6 or not valor.isdigit():
             if any(char.isalpha() for char in valor):  # Verifica se contém letras
                 return False, "Cada código deve conter apenas números, e você informou letras."
             if ' ' in valor:  # Verifica se contém espaços

@@ -187,6 +187,9 @@ class OrdemServicoInsumo(db_sql.Model):
 
     insumo_codigo_aen: Mapped[str] = mapped_column("TL_CODAEN", db_sql.VARCHAR, default='')
 
+    # Custo Médio, puxado da tabela de Saldo de Produtos (SB2)
+    insumo_custo_medio: Mapped[float] = db_sql.Column('TL_CUSTO', db_sql.Numeric(10, 2), default=0.0)
+
 
 @dataclass
 class OrdemServicoComentario(db_sql.Model):

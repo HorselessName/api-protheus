@@ -1,0 +1,52 @@
+Incluir um Comentário em uma Ordem de Serviço
+---
+tags:
+  - Ordens de Serviço
+parameters:
+  - in: path
+    name: ordem_id
+    type: string
+    required: true
+    description: O ID da Ordem de Serviço na qual o comentário será incluído.
+  - in: query
+    name: filial
+    type: string
+    required: true
+    description: A filial relacionada à Ordem de Serviço.
+  - in: body
+    name: corpo
+    description: Informações do comentário a ser adicionado.
+    required: true
+    schema:
+      type: object
+      required:
+        - texto_comentario
+      properties:
+        texto_comentario:
+          type: string
+          description: O texto do comentário a ser adicionado à Ordem de Serviço.
+responses:
+  200:
+    description: Comentário adicionado com sucesso.
+    schema:
+      type: object
+      properties:
+        mensagem:
+          type: string
+          description: Mensagem de sucesso ao adicionar o comentário.
+  400:
+    description: Requisição inválida (parâmetros faltando ou inválidos).
+    schema:
+      type: object
+      properties:
+        erro:
+          type: string
+          description: Mensagem de erro detalhando o que está faltando ou é inválido na requisição.
+  500:
+    description: Erro ao adicionar o comentário.
+    schema:
+      type: object
+      properties:
+        erro:
+          type: string
+          description: Mensagem de erro indicando que ocorreu um problema ao tentar adicionar o comentário.

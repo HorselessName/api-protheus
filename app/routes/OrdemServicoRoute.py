@@ -113,3 +113,57 @@ def incluir_ordem_insumo(ordem_id):
         return jsonify(resposta), 200
     else:
         return jsonify({"erro": mensagem_insumo}), 500
+
+
+@blueprint_ordem_servico.route('/ordens_servico/<ordem_id>/comentarios/listar', methods=['GET'])
+@swag_from('./api_docs/ComentariosPorOrdemDocs.yaml')
+def get_ordem_comentarios(ordem_id):
+    # Argumentos esperados
+    argumentos_esperados = {'ordem_filial'}
+    argumentos_recebidos = set(request.args.keys())
+
+    # Verifica se há argumentos desconhecidos
+    argumentos_desconhecidos = argumentos_recebidos - argumentos_esperados
+    if argumentos_desconhecidos:
+        return jsonify({"erro": f"Argumentos desconhecidos recebidos: {', '.join(argumentos_desconhecidos)}"}), 400
+
+    # Continua a execução normal se todos os argumentos forem conhecidos
+    ordem_filial = request.args.get('ordem_filial')
+
+    print("Ordem Filial:", ordem_filial)
+    print("Ordem ID:", ordem_id)
+
+    ordem_id_valida, mensagem = validar_numeros(ordem_id)
+    ordem_filial_valida, mensagem = validar_numeros(ordem_filial)
+
+    if not ordem_id_valida or not ordem_filial_valida:
+        return jsonify({"erro": mensagem}), 400
+
+    comentarios_json, query_str = OrdemServicoService.get_comentarios_da_os(ordem_id, ordem_filial)
+
+    print("-" * 30)
+    print("Trazendo os comentários da O.S. por ID:", ordem_id, "e Filial:", ordem_filial)
+
+    return jsonify(comentarios=comentarios_json, SQL=query_str), 200
+
+
+@swag_from('./api_docs/IncluirComentarioDocs.yaml')
+@blueprint_ordem_servico.route('/ordens_servico/<ordem_id>/comentarios/incluir', methods=['POST'])
+def incluir_comentarios_na_os(ordem_id):
+    ordem_filial = request.args.get('filial')
+    texto_comentario = request.json.get('texto_comentario')
+
+    ordem_id_valida, mensagem = validar_numeros(ordem_id)
+    ordem_filial_valida, mensagem_filial = validar_numeros(ordem_filial)
+
+    if not (ordem_id_valida and ordem_filial_valida):
+        mensagem_erro = mensagem if not ordem_id_valida else mensagem_filial
+        return jsonify({"erro": mensagem_erro}), 400
+
+    # Chama a service para adicionar o comentário
+    resultado = OrdemServicoService.adicionar_comentario_na_os(ordem_id, ordem_filial, texto_comentario)
+
+    if isinstance(resultado, str) and resultado.startswith("Erro"):
+        return jsonify({"erro": resultado}), 500
+    else:
+        return jsonify(resultado), 200
