@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 from db_context import db_sql
@@ -48,7 +48,6 @@ class OrdemServico(db_sql.Model):
 
     ordem_ultima_alteracao: Mapped[str] = mapped_column('TJ_USUARIO', db_sql.String)
     ordem_codsetor: Mapped[str] = mapped_column('TJ_CENTRAB', db_sql.String)
-    ordem_observacao: Mapped[str] = mapped_column('TJ_OBSERVA', db_sql.String)
     ordem_codsolicitacao: Mapped[str] = mapped_column('TJ_SOLICI', db_sql.String)
     ordem_situacao: Mapped[str] = mapped_column('TJ_SITUACA', db_sql.String)
 
@@ -92,6 +91,31 @@ class OrdemServico(db_sql.Model):
     def ordem_equipamento_nome(self):
         return self.equipamento_da_ordem.equipamento_nome if self.equipamento_da_ordem else None
 
+    # O `db_sql.VARBINARY` informa o `DATA_TYPE` do campo no banco de dados, e o `Mapped` do SQLAlchemy faz a conversão.
+    ordem_observacao_binario: Mapped[bytes] = db_sql.Column('TJ_OBSERVA', db_sql.VARBINARY, nullable=True, default=None)
+
+    @property
+    def ordem_observacao(self):
+        """
+        Retorna a observação da O.S. em texto.
+
+        Verificar Collation: On SQL Server you can right click on a DB from the Object Explorer in SSMS
+        (SQL Server Management Studio) and Under the General Tab you see the Collation under Maintenance subgroup.
+
+        Collations: Latin1_General_BIN
+
+        """
+        if self.ordem_observacao_binario is not None:
+            try:
+                texto_observacao = self.ordem_observacao_binario.decode('latin1')
+                texto_observacao = texto_observacao.replace('\x00', '')
+                return texto_observacao
+            except UnicodeDecodeError as e:
+                print(f"Erro ao decodificar _ordem_observacao_bin: {e}")
+                return None
+        else:
+            return None
+
 
 @dataclass
 class OrdemServicoInsumo(db_sql.Model):
@@ -103,7 +127,6 @@ class OrdemServicoInsumo(db_sql.Model):
     insumo_ordem_id: Mapped[str] = mapped_column('TL_ORDEM', db_sql.VARCHAR, ForeignKey(OrdemServico.ordem_id))
 
     insumo_quantidade: Mapped[float] = mapped_column("TL_QUANTID", db_sql.Float)
-
     insumo_unidade: Mapped[str] = mapped_column("TL_UNIDADE", db_sql.VARCHAR)
 
     insumo_data_inicio: Mapped[str] = mapped_column("TL_DTINICI", db_sql.VARCHAR)
@@ -143,7 +166,7 @@ class OrdemServicoInsumo(db_sql.Model):
     insumo_sequencia_retorno: Mapped[str] = mapped_column("TL_SEQRELA", db_sql.VARCHAR, default='0')
     insumo_tarefa: Mapped[str] = mapped_column("TL_TAREFA", db_sql.VARCHAR, default='0')
     insumo_quantidade_recomendada: Mapped[float] = mapped_column("TL_QUANREC", db_sql.Float, default=0.0)
-    insumo_usa_calendario: Mapped[str] = mapped_column("TL_USACALE", db_sql.VARCHAR , default='N')
+    insumo_usa_calendario: Mapped[str] = mapped_column("TL_USACALE", db_sql.VARCHAR, default='N')
     insumo_destino: Mapped[str] = mapped_column("TL_DESTINO", db_sql.VARCHAR, default='S')
     insumo_almoxarifado: Mapped[str] = mapped_column("TL_LOCAL", db_sql.VARCHAR, default='40')
     insumo_local_aplicacao: Mapped[str] = mapped_column("TL_LOCAPLI", db_sql.VARCHAR, default='')
@@ -163,3 +186,21 @@ class OrdemServicoInsumo(db_sql.Model):
     insumo_sequencia_tarefa: Mapped[str] = mapped_column("TL_SEQTARE", db_sql.VARCHAR, default='')
 
     insumo_codigo_aen: Mapped[str] = mapped_column("TL_CODAEN", db_sql.VARCHAR, default='')
+
+    # Custo Médio, puxado da tabela de Saldo de Produtos (SB2)
+    insumo_custo_medio: Mapped[float] = db_sql.Column('TL_CUSTO', db_sql.Numeric(10, 2), default=0.0)
+
+
+@dataclass
+class OrdemServicoComentario(db_sql.Model):
+    __tablename__ = 'SZC010'
+
+    comentario_os_filial: Mapped[str] = mapped_column('ZC_FILIAL', db_sql.VARCHAR, primary_key=True)
+    comentario_os_seq: Mapped[str] = mapped_column('ZC_SEQ', db_sql.VARCHAR, primary_key=True)
+    comentario_os_ordem: Mapped[str] = mapped_column('ZC_ORDEM', db_sql.VARCHAR, primary_key=True)
+    comentario_os_texto: Mapped[str] = mapped_column('ZC_TXT', db_sql.VARCHAR)
+
+    comentario_os_data: Mapped[str] = mapped_column('ZC_DATA', db_sql.VARCHAR)
+    comentario_os_hora: Mapped[str] = mapped_column('ZC_HORA', db_sql.VARCHAR)
+
+    R_E_C_N_O_: Mapped[str] = mapped_column('R_E_C_N_O_', db_sql.BIGINT)

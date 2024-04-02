@@ -1,4 +1,4 @@
-from models import OrdemServico, OrdemServicoInsumo
+from models import OrdemServico, OrdemServicoComentario
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow import fields
 from models import OrdemServicoInsumo
@@ -32,7 +32,7 @@ class OrdemServicoInsumoSchema(SQLAlchemyAutoSchema):
         model = OrdemServicoInsumo
         load_instance = True
         include_fk = True
-        fields = ("detalhes_insumo", )
+        fields = ("detalhes_insumo",)
         ordered = True
 
 
@@ -41,9 +41,17 @@ class OrdemServicoSchema(SQLAlchemyAutoSchema):
     Schema do Marshmallow para Desserialização, com relacionamento One to Many com os Insumos da O.S.
     """
 
-    ordem_insumos = fields.Nested(OrdemServicoInsumoSchema(many=True,))
+    ordem_insumos = fields.Nested(OrdemServicoInsumoSchema(many=True, ))
     ordem_prioridade = fields.Method("get_ordem_prioridade")
     ordem_equipamento_nome = fields.Method("get_ordem_equipamento_nome")
+    ordem_observacao = fields.Method("get_ordem_observacao")
+
+    @staticmethod
+    def get_ordem_observacao(obj):
+        """
+        Método para ver a observação da Ordem de Serviço.
+        """
+        return obj.ordem_observacao if obj.ordem_observacao else None
 
     @staticmethod
     def get_ordem_prioridade(obj):
@@ -63,5 +71,16 @@ class OrdemServicoSchema(SQLAlchemyAutoSchema):
         model = OrdemServico
         load_instance = True
         include_fk = True
-        exclude = ("ordem_excluida",)
+        exclude = ("ordem_excluida", "ordem_observacao_binario",)
+        ordered = True
+
+
+class OrdemServicoComentarioSchema(SQLAlchemyAutoSchema):
+    """
+    Schema do Marshmallow para Desserialização dos Comentários da Ordem de Serviço.
+    """
+
+    class Meta:
+        model = OrdemServicoComentario
+        load_instance = True
         ordered = True
