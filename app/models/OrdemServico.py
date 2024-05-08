@@ -167,7 +167,7 @@ class OrdemServicoInsumo(db_sql.Model):
     insumo_tarefa: Mapped[str] = mapped_column("TL_TAREFA", db_sql.VARCHAR, default='0')
     insumo_quantidade_recomendada: Mapped[float] = mapped_column("TL_QUANREC", db_sql.Float, default=0.0)
     insumo_usa_calendario: Mapped[str] = mapped_column("TL_USACALE", db_sql.VARCHAR, default='N')
-    insumo_destino: Mapped[str] = mapped_column("TL_DESTINO", db_sql.VARCHAR, default='S')
+    insumo_destino: Mapped[str] = mapped_column("TL_DESTINO", db_sql.VARCHAR, default='T')
     insumo_almoxarifado: Mapped[str] = mapped_column("TL_LOCAL", db_sql.VARCHAR, default='40')
     insumo_local_aplicacao: Mapped[str] = mapped_column("TL_LOCAPLI", db_sql.VARCHAR, default='')
     insumo_numero_sc: Mapped[str] = mapped_column("TL_NUMSC", db_sql.VARCHAR, default='')

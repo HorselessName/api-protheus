@@ -278,14 +278,15 @@ class OrdemServicoService:
             # Incrementando o valor máximo
             novo_rec_no = max_rec_no + 1
 
-            # Aqui, assumimos que o método get_valor_do_insumo retorna apenas o valor do custo médio ou None
-            custo_medio_info = (OrdemServicoService.get_valor_do_insumo(
+            print("Calculando o Custo Medio do Insumo ... Para inserir.")
+            custo_medio_info = OrdemServicoService.get_valor_do_insumo(
                 ordem_filial,
                 insumo_dados["insumo_codigo"],
-                insumo_dados["insumo_armazem"])
+                insumo_dados["insumo_local"]
             )
 
-            custo_medio = custo_medio_info.get('saldo_produto_custo_medio') if custo_medio_info else 0.00
+            # Diretamente atribui o valor retornado ou 0.00 se for None
+            custo_medio = custo_medio_info if custo_medio_info is not None else 0.00
 
             # Criando uma nova instância de OrdemServicoInsumo
             novo_insumo = OrdemServicoInsumo(
@@ -354,7 +355,7 @@ class OrdemServicoService:
                 insumo_hora_fim=(datetime.now() + timedelta(hours=1)).strftime('%H:%M'),
 
                 # Adicionando o custo médio do insumo
-                custo_medio=custo_medio
+                insumo_custo_medio=custo_medio
             )
 
             compiled_query = insert_statement.compile(dialect=mssql.dialect(), compile_kwargs={"literal_binds": True})
@@ -365,7 +366,7 @@ class OrdemServicoService:
 
             return True, "Insumo incluído com sucesso."
         except Exception as e:
-            print("Ocorreu um Erro no INSERT: ", e)
+            print("Ocorreu um Erro no INSERT do Insumo: ", e)
             # Em caso de erro, desfazer a transação e retornar False.
             db_sql.session.rollback()
             return False, "Erro ao incluir o insumo na O.S."
@@ -384,6 +385,8 @@ class OrdemServicoService:
         if custo_medio_insumo_query:
             produto_saldo_schema = ProdutoSaldoSchema(only=['saldo_produto_custo_medio'])
             custo_medio_serializado = produto_saldo_schema.dump(custo_medio_insumo_query)
+
+            print("Custo Médio do Insumo foi GERADO! --> ", custo_medio_serializado.get('saldo_produto_custo_medio'))
             return custo_medio_serializado.get('saldo_produto_custo_medio')
         else:
             return None

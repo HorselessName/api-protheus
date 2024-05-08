@@ -29,6 +29,7 @@ definitions:
       - insumo_unidade
       - insumo_codigo
       - insumo_tipo
+      - insumo_local
       - ordem_filial
     properties:
       insumo_quantidade:
@@ -43,6 +44,9 @@ definitions:
       insumo_tipo:
         type: string
         description: Código do tipo de insumo
+      insumo_local:
+        type: string
+        description: Local de consumo do insumo
       ordem_filial:
         type: string
         description: Código da Filial

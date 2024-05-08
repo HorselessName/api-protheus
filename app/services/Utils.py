@@ -183,3 +183,28 @@ def horario_atual():
     data_formatada = agora.strftime('%Y%m%d %H:%M')
 
     return data_formatada
+
+
+def remover_espacos_do_json(estrutura):
+    """
+    Remove espaços em branco dos valores de uma estrutura JSON,
+    tratando recursivamente estruturas aninhadas.
+    """
+    if isinstance(estrutura, dict):
+        return {chave: remover_espacos_do_json(valor) for chave, valor in estrutura.items()}
+    elif isinstance(estrutura, list):
+        return [remover_espacos_do_json(item) for item in estrutura]
+    elif isinstance(estrutura, str):
+        return estrutura.strip()
+    else:
+        return estrutura
+
+
+def validar_estrutura_json(estrutura):
+    if isinstance(estrutura, (str, int, float, bool, type(None))):
+        return True
+    elif isinstance(estrutura, list):
+        return all(validar_estrutura_json(item) for item in estrutura)
+    elif isinstance(estrutura, dict):
+        return all(isinstance(chave, str) and validar_estrutura_json(valor) for chave, valor in estrutura.items())
+    return False

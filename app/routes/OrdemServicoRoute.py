@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.OrdemServicoService import OrdemServicoService
-from services.Utils import validar_caracteres, validar_numeros
+from services.Utils import validar_caracteres, validar_numeros, validar_estrutura_json, remover_espacos_do_json
 from flasgger import swag_from
 
 """
@@ -80,31 +80,33 @@ def get_ordem_insumos(ordem_id):
 @blueprint_ordem_servico.route('/ordens_servico/<ordem_id>/insumos/incluir', methods=['POST'])
 @swag_from('./api_docs/IncluirInsumoDocs.yaml')
 def incluir_ordem_insumo(ordem_id):
-    insumo_json = request.get_json()
-    print("Incluindo Insumo na O.S.:", ordem_id, "Filial:", insumo_json.get("ordem_filial"))
-    print("Insumo:", insumo_json)
+    insumo_json_bruto = request.get_json()
+    insumo_json = remover_espacos_do_json(insumo_json_bruto)
 
-    # Campos esperados no JSON
-    campos_esperados_json = {
-        "insumo_codigo", "insumo_quantidade", "insumo_tipo", "insumo_unidade", "ordem_filial"
-    }
+    if not validar_estrutura_json(insumo_json):
+        return jsonify({"erro": "Estrutura JSON inválida"}), 400
 
-    # Verificar se todos os campos esperados estão presentes e se não há campos extras
+    campos_esperados_json = {"insumo_codigo", "insumo_quantidade", "insumo_tipo",
+                             "insumo_unidade", "insumo_local", "ordem_filial"}
+
+    # Verifica se a estrutura do JSON contém todos os campos esperados e não contém campos extras
     if set(insumo_json.keys()) != campos_esperados_json:
-        return jsonify({
-            "erro": "JSON deve conter exatamente os campos: insumo_codigo, insumo_quantidade, "
-                    "insumo_unidade, insumo_tipo, ordem_filial"
-        }), 400
+        campos_faltando = campos_esperados_json - set(insumo_json.keys())
+        campos_extras = set(insumo_json.keys()) - campos_esperados_json
+        mensagem_erro = "JSON deve conter exatamente os campos: " + ", ".join(sorted(campos_esperados_json)) + "."
+        if campos_faltando:
+            mensagem_erro += " Faltando: " + ", ".join(sorted(campos_faltando)) + "."
+        if campos_extras:
+            mensagem_erro += " Campos extras não permitidos: " + ", ".join(sorted(campos_extras)) + "."
+        return jsonify({"erro": mensagem_erro}), 400
 
-    # Chamar a função para incluir o insumo na ordem de serviço
     sucesso, mensagem_insumo = OrdemServicoService.incluir_insumo_na_ordem(
         ordem_id,
-        insumo_json.get("ordem_filial"),
+        insumo_json["ordem_filial"],
         insumo_json
     )
 
     if sucesso:
-        # Incluir a ordem_id no objeto de retorno
         resposta = {
             "mensagem": mensagem_insumo,
             "ordem_id": ordem_id,
